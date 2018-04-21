@@ -12,9 +12,11 @@ function makePlayer() {
     };
 
     let size = {
-        width: 0.05,
-        height: 0.05
+        width: 0.5,
+        height: 0.5
     };
+
+    let radius = (size.width+size.height)/2;
 
     let worldView = {
       x: position.x + view.left,
@@ -64,6 +66,10 @@ function makePlayer() {
 
     Object.defineProperty(that, 'size', {
         get: () => size
+    });
+
+    Object.defineProperty(that, 'radius', {
+        get: () => radius
     });
 
     that.moveUp = function(elapsedTime) {
