@@ -6,7 +6,7 @@
 function createMissile(spec) {
     let that = {};
 
-    let radius = 0.0025;
+    let radius = 0.25;
     let speed = spec.speed + 0.0002;    // unit distance per millisecond
     let acceleration = 1.02;
     let timeRemaining = 1500;   // milliseconds
