@@ -83,10 +83,10 @@ Rocket.main = (function(input, logic, graphics, assets) {
     }
 
     function playerHits(data) {
-        console.log('hits');
+        // console.log('hits');
         let position = drawObjects(data.position);
-        console.log(data.position);
-        console.log(position);
+        // console.log(data.position);
+        // console.log(position);
         delete missiles[data.missileId];
         if (position){
             hits.push({
@@ -271,6 +271,7 @@ Rocket.main = (function(input, logic, graphics, assets) {
     function updateOthers(data) {
         gameTime = data.gameTime;
         shield = data.shield;
+        dead = data.dead;
 
         if (otherUsers.hasOwnProperty(data.clientId)) {
             let model = otherUsers[data.clientId].model;
@@ -284,6 +285,7 @@ Rocket.main = (function(input, logic, graphics, assets) {
 
             model.goal.position.y = data.worldView.y;
             model.goal.orientation = data.orientation;
+            model.state.dead = dead;
         }
     }
 
@@ -409,9 +411,11 @@ Rocket.main = (function(input, logic, graphics, assets) {
             let object = otherUsers[index].model.state.position;
             if (!object.hasOwnProperty('x')) continue;
             let position = drawObjects(object);
-            if (position.hasOwnProperty('x')){
-                graphics.draw(otherUsers[index].texture, position,
-                    otherUsers[index].model.size, otherUsers[index].model.state.orientation, false)
+            if(!otherUsers[index].model.state.dead){
+                if (position.hasOwnProperty('x')){
+                    graphics.draw(otherUsers[index].texture, position,
+                        otherUsers[index].model.size, otherUsers[index].model.state.orientation, false)
+                }
             }
         }
         for (let missile in missiles){
