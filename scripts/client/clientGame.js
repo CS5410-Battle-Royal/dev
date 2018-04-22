@@ -199,6 +199,9 @@ Rocket.main = (function(input, logic, graphics, assets) {
         if (data.item){
             myPlayer.model.sprint = data.sprint;
         }
+        if (data.dead){
+            myPlayer.model.dead = data.dead;
+        }
         gameTime = data.gameTime;
         shield = data.shield;
         pickups = data.pickups;
@@ -433,7 +436,13 @@ Rocket.main = (function(input, logic, graphics, assets) {
                 graphics.draw(pickups[pickup].texture, position, {width: pickups[pickup].width,height: pickups[pickup].height},0,false);
             }
         }
-        graphics.draw(myPlayer.texture, myPlayer.model.position, myPlayer.model.size, myPlayer.model.orientation, true);
+        // draw self
+        if(myPlayer.model.dead){
+            graphics.draw('tombstone.png', myPlayer.model.position, myPlayer.model.size, myPlayer.model.orientation, true);
+        }else{
+            graphics.draw(myPlayer.texture, myPlayer.model.position, myPlayer.model.size, myPlayer.model.orientation, true);
+        }
+        
 
         for (let index in hits){
             graphics.draw(hits[index].texture, hits[index].model.position, hits[index].model.size,
@@ -474,6 +483,7 @@ Rocket.main = (function(input, logic, graphics, assets) {
         graphics.createImage('orangeCarrot.png');
         graphics.createImage('purpleCarrot.png');
         graphics.createImage('explode.png');
+        graphics.createImage('tombstone.png');
         graphics.initGraphics();
 
         keyboard.registerHandler(elapsedTime => {
