@@ -23,6 +23,7 @@ let nextMissileId = 1;
 let gameTime = 10 * 60; //seconds
 let shield = {};
 let trees;
+let buildings;
 let pickups = {};
 let killedPlayers = [];
 
@@ -134,6 +135,7 @@ function obstacle(user){
         };
 
         if (collided(treePosition, newCenter)) {
+            console.log('tree')
             let deltaX = user.worldView.x - treePosition.position.x;
             let deltaY = (treePosition.position.y + treePosition.radius) - user.worldView.y;
             let objDir = Math.atan2(deltaY, deltaX);
@@ -144,6 +146,30 @@ function obstacle(user){
             newCenter.position.y = (treePosition.position.y + treePosition.radius) - vectorY;
         }
     }
+
+    for (let index in buildings.buildingArray){
+        console.log('building')
+        let buildingPosition = {
+            position: {
+                x: buildings.buildingArray[index].model.position.x,
+                y: buildings.buildingArray[index].model.position.y
+            },
+            radius: buildings.buildingArray[index].model.radius,
+            type: 'building'
+        };
+
+        if (collided(buildingPosition, newCenter)) {
+            let deltaX = user.worldView.x - buildingPosition.position.x;
+            let deltaY = buildingPosition.position.y - user.worldView.y;
+            let objDir = Math.atan2(deltaY, deltaX);
+            let vectorX = Math.cos(objDir) * (buildingPosition.radius + user.radius);
+            let vectorY = Math.sin(objDir) * (buildingPosition.radius + user.radius);
+
+            newCenter.position.x = buildingPosition.position.x + vectorX;
+            newCenter.position.y = buildingPosition.position.y - vectorY;
+        }
+    }
+
     return newCenter.position;
 }
 
@@ -235,6 +261,19 @@ function update(elapsedTime, currentTime) {
                     userId: index,
                     missileId: activeMissiles[missile].id,
                     position: trees.treeArray[index].model.position,
+                    signature: activeMissiles[missile].userId,
+                    hitPlayer: false,
+                    direction: activeMissiles[missile].direction
+                });
+            }
+        }
+        for (let index in buildings.buildingArray){
+            if (collided(activeMissiles[missile], buildings.buildingArray[index].model)) {
+                hit = true;
+                hits.push({
+                    userId: index,
+                    missileId: activeMissiles[missile].id,
+                    position: buildings.buildingArray[index].model.position,
                     signature: activeMissiles[missile].userId,
                     hitPlayer: false,
                     direction: activeMissiles[missile].direction
@@ -669,6 +708,7 @@ function initializeSocketIO(http) {
 
 function createObstacles() {
     trees = User.makeTrees();
+    buildings = User.makeBuildings();
 }
 
 function initialize(http) {
