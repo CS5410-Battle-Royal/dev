@@ -86,6 +86,8 @@ function processInput(elapsedTime) {
                 if(client.user.inventory.ammo > 0){
                     client.user.inventory.ammo -= 1;
                     createMissile(input.message.userId, client.user);
+                }else{
+                    client.user.inventory.ammo = 0;
                 }
 
                 break;
@@ -411,7 +413,9 @@ function updateClients(elapsedTime) {
             updateWindow: lastUpdate,
             gameTime: gameTime,
             shield: shield,
-            dead: activeUsers[clientId].user.dead
+            dead: activeUsers[clientId].user.dead,
+            ammo: activeUsers[clientId].user.inventory.ammo,
+            health: activeUsers[clientId].user.inventory.health
         };
         if (client.user.reportUpdate) {
             update.pickups = getLocalWeapons(client);
