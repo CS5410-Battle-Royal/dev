@@ -196,5 +196,45 @@ function makeTrees(){
     return that;
 }
 
+function makeBuildings(){
+
+    let that = {};
+
+    let buildingArray = [],
+        buildingIndex = [ [1.75, 1], [4, 1], [2.75, 2.75], [4.3, 3]],
+        Buildings = {
+            num: 4
+        },
+        buildingSize = {
+            width: .5,
+            height: .5
+        };
+
+    for (let i = 0; i < Buildings.num; i++){
+        buildingArray.push( {
+            model: {
+                position : {
+                    x: buildingIndex[i][0],
+                    y: buildingIndex[i][1]
+                },
+                size: {
+                    height: buildingSize.height,
+                    width: buildingSize.width
+                },
+                radius: .25
+            },
+            id: i+1
+        });
+    }
+
+    Object.defineProperty(that, 'buildingArray', {
+        get: () => buildingArray,
+        set: value => { buildingArray = value; }
+    });
+
+    return that;
+}
+
 module.exports.makeplayer = makePlayer;
 module.exports.makeTrees = makeTrees;
+module.exports.makeBuildings = makeBuildings;
