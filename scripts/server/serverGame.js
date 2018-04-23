@@ -24,8 +24,15 @@ let gameTime = 10 * 60; //seconds
 let shield = {};
 let trees;
 let pickups = {};
+let killedPlayers = [];
 
 function createMissile(userId, user) {
+    let timeM;
+    if(user.inventory.weapon < 0){
+        timeM = 200;
+    }else{
+        timeM = 1500;
+    }
     let missile = Missile.create({
         id: nextMissileId++,
         userId: userId,
@@ -35,7 +42,8 @@ function createMissile(userId, user) {
             y: user.worldView.y
         },
         direction: user.orientation,
-        speed: user.speed
+        speed: user.speed,
+        time: timeM
     });
 
     newMissiles.push(missile);
@@ -75,7 +83,11 @@ function processInput(elapsedTime) {
                 client.user.flipIt(input.message.elapsedTime);
                 break;
             case NetworkIds.INPUT_FIRE:
-                createMissile(input.message.userId, client.user);
+                if(client.user.inventory.ammo > 0){
+                    client.user.inventory.ammo -= 1;
+                    createMissile(input.message.userId, client.user);
+                }
+
                 break;
         }
     }
@@ -133,6 +145,16 @@ function obstacle(user){
     return newCenter.position;
 }
 
+//------------------------------------------------------------------
+//
+// This Kills the player and takes care of player data
+//
+//------------------------------------------------------------------
+
+function killedPlayer(clientId){
+    activeUsers[clientId].user.dead = true;
+    activeUsers[clientId].user.inventory.ammo = 0;
+}
 
 //------------------------------------------------------------------
 //
@@ -174,30 +196,33 @@ function update(elapsedTime, currentTime) {
     for (let missile = 0; missile < activeMissiles.length; missile++) {
         let hit = false;
         for (let clientId in activeUsers) {
-            //
             // Don't allow a missile to hit the player it was fired from.
             if (clientId !== activeMissiles[missile].userId) {
-                if (collided(activeMissiles[missile], activeUsers[clientId].user)) {
-                    hit = true;
-                    hits.push({
-                        userId: clientId,
-                        missileId: activeMissiles[missile].id,
-                        position: activeUsers[clientId].user.position,
-                        signature: activeMissiles[missile].userId,
-                        hitPlayer: true,
-                        direction: activeMissiles[missile].direction
-                    });
+                if(!activeUsers[clientId].user.dead){
+                    if (collided(activeMissiles[missile], activeUsers[clientId].user)) {
+                        hit = true;
+                        hits.push({
+                            userId: clientId,
+                            missileId: activeMissiles[missile].id,
+                            position: activeUsers[clientId].user.position,
+                            signature: activeMissiles[missile].userId,
+                            hitPlayer: true,
+                            direction: activeMissiles[missile].direction
+                        });
 
-                    if(activeMissiles[missile].missileType < 1){
-                        activeUsers[clientId].user.inventory.health -= 5;
-                    }else{
-                        activeUsers[clientId].user.inventory.health -= 10;
+                        if(activeMissiles[missile].missileType < 0){
+                            activeUsers[clientId].user.inventory.health -= 1;
+                        }else if(activeMissiles[missile].missileType < 1){
+                            activeUsers[clientId].user.inventory.health -= 5;
+                        }else{
+                            activeUsers[clientId].user.inventory.health -= 10;
+                        }
+
+                        if(activeUsers[clientId].user.inventory.health < 1){
+                            killedPlayer(clientId);
+                        }
+                        
                     }
-
-                    if(activeUsers[clientId].user.inventory.health < 0){
-                        console.log("You Are Dead!");
-                    }
-
                 }
             }
         }
@@ -220,50 +245,50 @@ function update(elapsedTime, currentTime) {
     }
     activeMissiles = keepMissiles;
 
-
-
    // Check if player has picked up items
+   
     for (let clientId in activeUsers) {
-        let keepPickups = [];   //
-        let localPickups = pickups.row[Math.floor(activeUsers[clientId].user.worldView.y)].col[Math.floor(activeUsers[clientId].user.worldView.x)];
-            for (let pickup in localPickups) {
-                let hit = false;
-                if (collided(localPickups[pickup], activeUsers[clientId].user)) {
-                    hit = true;
+        if(!activeUsers[clientId].user.dead){
+            let keepPickups = [];   // 
+            let localPickups = pickups.row[Math.floor(activeUsers[clientId].user.worldView.y)].col[Math.floor(activeUsers[clientId].user.worldView.x)];
+                for (let pickup in localPickups) {
+                    let hit = false;
+                    if (collided(localPickups[pickup], activeUsers[clientId].user)) {
+                        hit = true;
 
-                    switch (localPickups[pickup].type) {
-                        case "ammo":
-                            activeUsers[clientId].user.inventory.ammo += 5;
-                            break;
-                        case "health":
-                            if(activeUsers[clientId].user.inventory.health < 100){
-                                activeUsers[clientId].user.inventory.health = (activeUsers[clientId].user.inventory.health + 10) % 101;
-                            }else{
-                                hit = false;
-                            }
-                            break;
-                        case "weapon":
-                            if(activeUsers[clientId].user.inventory.weapon < 0){
-                                activeUsers[clientId].user.inventory.weapon = 0;
-                            }else{
-                                hit = false;
-                            }
-                            break;
-                        case "upgrade":
-                            if(activeUsers[clientId].user.inventory.weapon < 1 && activeUsers[clientId].user.inventory.weapon > -1){
-                                activeUsers[clientId].user.inventory.weapon = 1;
-                            }else{
-                                hit = false;
-                            }
-                            break;
+                        switch (localPickups[pickup].type) {
+                            case "ammo":
+                                activeUsers[clientId].user.inventory.ammo += 5;
+                                break;
+                            case "health":
+                                if(activeUsers[clientId].user.inventory.health < 100){
+                                    activeUsers[clientId].user.inventory.health = (activeUsers[clientId].user.inventory.health + 10) % 101;
+                                }else{
+                                    hit = false;
+                                }
+                                break;
+                            case "weapon":
+                                if(activeUsers[clientId].user.inventory.weapon < 0){
+                                    activeUsers[clientId].user.inventory.weapon = 0;
+                                }else{
+                                    hit = false;
+                                }
+                                break;
+                            case "upgrade":
+                                if(activeUsers[clientId].user.inventory.weapon < 1 && activeUsers[clientId].user.inventory.weapon > -1){
+                                    activeUsers[clientId].user.inventory.weapon = 1;
+                                }else{
+                                    hit = false;
+                                }
+                                break;
+                        }
                     }
-
+                    if (!hit) {
+                        keepPickups.push(localPickups[pickup]);
+                    }
                 }
-                if (!hit) {
-                    keepPickups.push(localPickups[pickup]);
-                }
-            }
-            pickups.row[Math.floor(activeUsers[clientId].user.worldView.y)].col[Math.floor(activeUsers[clientId].user.worldView.x)] = keepPickups;
+                pickups.row[Math.floor(activeUsers[clientId].user.worldView.y)].col[Math.floor(activeUsers[clientId].user.worldView.x)] = keepPickups;
+        }
     }
 }
 
@@ -385,7 +410,8 @@ function updateClients(elapsedTime) {
             worldView: client.user.worldView,
             updateWindow: lastUpdate,
             gameTime: gameTime,
-            shield: shield
+            shield: shield,
+            dead: activeUsers[clientId].user.dead
         };
         if (client.user.reportUpdate) {
             update.pickups = getLocalWeapons(client);
@@ -578,6 +604,7 @@ function initializeSocketIO(http) {
             //console.log(data.name + ' with id ' + socket.id + ' connected');
             if(reconnection) {
                 if(typeof activeUsers[data.name] !== 'undefined') {
+                    activeUsers[data.name].dead = false;
                     activeUsers[data.name].socket = socket;
                     activeUsers[data.name].id = socket.id;
                     activeUsers[data.name].user.clientId = socket.id;

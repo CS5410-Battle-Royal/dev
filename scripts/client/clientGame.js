@@ -254,6 +254,9 @@ Rocket.main = (function(input, logic, graphics, assets) {
         if (data.item){
             myPlayer.model.sprint = data.sprint;
         }
+        if (data.dead){
+            myPlayer.model.dead = data.dead;
+        }
         gameTime = data.gameTime;
         data.shield.particles = shield.particles;
         shield = data.shield;
@@ -327,6 +330,9 @@ Rocket.main = (function(input, logic, graphics, assets) {
     }
 
     function updateOthers(data) {
+        // gameTime = data.gameTime;
+        // shield = data.shield;
+        dead = data.dead;
         if (otherUsers.hasOwnProperty(data.clientId)) {
             let model = otherUsers[data.clientId].model;
             model.goal.updateWindow = data.updateWindow;
@@ -339,6 +345,7 @@ Rocket.main = (function(input, logic, graphics, assets) {
 
             model.goal.position.y = data.worldView.y;
             model.goal.orientation = data.orientation;
+            model.state.dead = dead;
         }
     }
 
@@ -461,8 +468,11 @@ Rocket.main = (function(input, logic, graphics, assets) {
         }
 
         for(let a = 0; a < shield.particles.length; a++) {
-            shield.particles[a].setPosition(shield.x+ Math.cos(a*((2*Math.PI)/360))*shield.radius,shield.y+ Math.sin(a*((2*Math.PI)/360))*shield.radius);
-            shield.particles[a].update(elapsedTime);
+            // let position = drawObjects(shield.particles[a].position, true);
+            // if (position.hasOwnProperty('x')){
+                shield.particles[a].setPosition(shield.x+ Math.cos(a*((2*Math.PI)/360))*shield.radius,shield.y+ Math.sin(a*((2*Math.PI)/360))*shield.radius);
+                shield.particles[a].update(elapsedTime);
+            // }
         }
 
         for (let missile = 0; missile < removeMissiles.length; missile++) {
@@ -523,9 +533,11 @@ Rocket.main = (function(input, logic, graphics, assets) {
             let object = otherUsers[index].model.state.position;
             if (!object.hasOwnProperty('x')) continue;
             let position = drawObjects(object);
-            if (position.hasOwnProperty('x')){
-                graphics.draw(otherUsers[index].texture, position,
-                    otherUsers[index].model.size, otherUsers[index].model.state.orientation, false)
+            if(!otherUsers[index].model.state.dead){
+                if (position.hasOwnProperty('x')){
+                    graphics.draw(otherUsers[index].texture, position,
+                        otherUsers[index].model.size, otherUsers[index].model.state.orientation, false)
+                }
             }
         }
         for (let missile in missiles){
@@ -543,7 +555,7 @@ Rocket.main = (function(input, logic, graphics, assets) {
                 graphics.draw(pickups[pickup].texture, position, {width: pickups[pickup].width,height: pickups[pickup].height},0,false);
             }
         }
-        graphics.draw(myPlayer.texture, myPlayer.model.position, myPlayer.model.size, myPlayer.model.orientation, true);
+
         for (let tree in treeArray){
             let position = drawObjects(treeArray[tree].model.position, true);
             if (position.hasOwnProperty('x')){
@@ -551,13 +563,23 @@ Rocket.main = (function(input, logic, graphics, assets) {
                     treeArray[tree].model.size, treeArray[tree].model.orientation, false)
             }
         }
+        // draw self
+        if(myPlayer.model.dead){
+            graphics.draw('tombstone.png', myPlayer.model.position, myPlayer.model.size, myPlayer.model.orientation, true);
+        }else{
+            graphics.draw(myPlayer.texture, myPlayer.model.position, myPlayer.model.size, myPlayer.model.orientation, true);
+        }
+        
         for (let index in hits){
             hits[index].particle.render(background.viewport);
         }
         graphics.drawShield(shield, background.viewport);
 
-        for (particle in shield.particles) {
-            shield.particles[particle].render(background.viewport)
+        for (let particle in shield.particles) {
+            let position = drawObjects(shield.particles[particle].position, true);
+            if (position.hasOwnProperty('x')){
+                shield.particles[particle].render(background.viewport)
+            }
         }
 
         mini.drawMini();
@@ -622,6 +644,7 @@ Rocket.main = (function(input, logic, graphics, assets) {
         graphics.createImage('explode.png');
         graphics.createImage('trees.png');
 
+        graphics.createImage('tombstone.png');
         graphics.initGraphics();
         createObstacles();
 
