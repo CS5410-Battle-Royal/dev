@@ -602,6 +602,7 @@ Rocket.main = (function(input, logic, graphics, assets) {
             graphics.draw('tombstone.png', myPlayer.model.position, myPlayer.model.size, myPlayer.model.orientation, true);
         }else{
             graphics.draw(myPlayer.texture, myPlayer.model.position, myPlayer.model.size, myPlayer.model.orientation, true);
+            graphics.drawHealthReactangle(myPlayer.model.position, myPlayer.model.orientation, 'red');
         }
         
         for (let tree in treeArray){
