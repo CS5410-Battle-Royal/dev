@@ -327,9 +327,6 @@ Rocket.main = (function(input, logic, graphics, assets) {
     }
 
     function updateOthers(data) {
-        gameTime = data.gameTime;
-        shield = data.shield;
-
         if (otherUsers.hasOwnProperty(data.clientId)) {
             let model = otherUsers[data.clientId].model;
             model.goal.updateWindow = data.updateWindow;
