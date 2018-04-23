@@ -39,6 +39,7 @@ function makePlayer() {
     let speed = .2;
     let flipped = true;
     let reportUpdate = false;
+    let dead = false;
 
     Object.defineProperty(that, 'reportUpdate', {
         get: () => reportUpdate,
@@ -47,6 +48,11 @@ function makePlayer() {
     Object.defineProperty(that, 'inventory', {
         get: () => inventory,
         set: value => inventory = value
+    });
+
+    Object.defineProperty(that, 'dead', {
+        get: () => dead,
+        set: value => dead = value
     });
 
     Object.defineProperty(that, 'orientation', {
