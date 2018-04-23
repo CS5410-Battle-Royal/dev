@@ -247,9 +247,13 @@ Rocket.main = (function(input, logic, graphics, assets) {
         }
         if (data.health){
             myPlayer.model.health = data.health;
+        }else{
+            myPlayer.model.health = 0;
         }
         if (data.ammo){
             myPlayer.model.ammo = data.ammo;
+        }else{
+            myPlayer.model.ammo = 0;
         }
         if (data.armor){
             myPlayer.model.armor = data.armor;
@@ -623,7 +627,11 @@ Rocket.main = (function(input, logic, graphics, assets) {
         mini.drawMini();
         mini.drawPosition(myPlayer.model.position, background.viewport, background.size);
         mini.drawShield(shield, background.viewport, background.size);
+
         document.getElementById('field-clock').innerHTML = gameClock(gameTime);
+        document.getElementById('health-display').innerHTML = "Health: " + myPlayer.model.health;
+        document.getElementById('ammo-display').innerHTML = "Ammo: " + myPlayer.model.ammo;
+        // console.log("Ammo: " + myPlayer.model.ammo);
     }
 
     function gameLoop(time) {
