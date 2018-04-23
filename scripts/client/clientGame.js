@@ -556,18 +556,19 @@ Rocket.main = (function(input, logic, graphics, assets) {
             }
         }
 
+        // draw self
+        if(myPlayer.model.dead){
+            graphics.draw('tombstone.png', myPlayer.model.position, myPlayer.model.size, myPlayer.model.orientation, true);
+        }else{
+            graphics.draw(myPlayer.texture, myPlayer.model.position, myPlayer.model.size, myPlayer.model.orientation, true);
+        }
+        
         for (let tree in treeArray){
             let position = drawObjects(treeArray[tree].model.position, true);
             if (position.hasOwnProperty('x')){
                 graphics.draw(treeArray[tree].texture, position,
                     treeArray[tree].model.size, treeArray[tree].model.orientation, false)
             }
-        }
-        // draw self
-        if(myPlayer.model.dead){
-            graphics.draw('tombstone.png', myPlayer.model.position, myPlayer.model.size, myPlayer.model.orientation, true);
-        }else{
-            graphics.draw(myPlayer.texture, myPlayer.model.position, myPlayer.model.size, myPlayer.model.orientation, true);
         }
         
         for (let index in hits){
