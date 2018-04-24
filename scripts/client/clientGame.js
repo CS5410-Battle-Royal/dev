@@ -5,8 +5,12 @@ Rocket.main = (function(input, logic, graphics, assets) {
     let keyboard = input.Keyboard(), lastTimeStamp, messageId = 1,
         myPlayer = {
             model: logic.Player(),
-            texture: 'bunny.png'
-        },
+            texture: 'bunny.png',
+            sprite: logic.Sprite({
+                spriteSheet: 'bunnysheet.png',
+                spriteCount: 8,
+                spriteSize: .05,			// Maintain the size on the sprite
+            }, graphics)},
         background = null,
         mini = graphics.miniMap(),
         jobQueue = logic.createQueue(),
@@ -242,24 +246,14 @@ Rocket.main = (function(input, logic, graphics, assets) {
     }
 
     function updateSelf(data) {
-        if (data.weapon){
+        if (data.hasOwnProperty('weapon')){
             myPlayer.model.weapon = data.weapon;
         }
-        if (data.health){
+        if (data.hasOwnProperty('health')){
             myPlayer.model.health = data.health;
-        }else{
-            myPlayer.model.health = 0;
         }
-        if (data.ammo){
+        if (data.hasOwnProperty('ammo')){
             myPlayer.model.ammo = data.ammo;
-        }else{
-            myPlayer.model.ammo = 0;
-        }
-        if (data.armor){
-            myPlayer.model.armor = data.armor;
-        }
-        if (data.item){
-            myPlayer.model.sprint = data.sprint;
         }
         if (data.dead){
             myPlayer.model.dead = data.dead;
@@ -337,8 +331,6 @@ Rocket.main = (function(input, logic, graphics, assets) {
     }
 
     function updateOthers(data) {
-        // gameTime = data.gameTime;
-        // shield = data.shield;
         dead = data.dead;
         if (otherUsers.hasOwnProperty(data.clientId)) {
             let model = otherUsers[data.clientId].model;
@@ -477,10 +469,12 @@ Rocket.main = (function(input, logic, graphics, assets) {
     function update(elapsedTime){
         updateMsgs();
         shiftView(myPlayer.model.position, elapsedTime);
+        myPlayer.model.position = obstacle();
         myPlayer.model.projected = myPlayer.model.position;
         for (let index in otherUsers){
             otherUsers[index].model.update(elapsedTime);
         }
+        myPlayer.sprite.update(elapsedTime);
 
         for (let index in hits){
             hits[index].life -= elapsedTime;
@@ -501,11 +495,8 @@ Rocket.main = (function(input, logic, graphics, assets) {
         }
 
         for(let a = 0; a < shield.particles.length; a++) {
-            // let position = drawObjects(shield.particles[a].position, true);
-            // if (position.hasOwnProperty('x')){
-                shield.particles[a].setPosition(shield.x+ Math.cos(a*((2*Math.PI)/360))*shield.radius,shield.y+ Math.sin(a*((2*Math.PI)/360))*shield.radius);
-                shield.particles[a].update(elapsedTime);
-            // }
+            shield.particles[a].setPosition(shield.x+ Math.cos(a*((2*Math.PI)/360))*shield.radius,shield.y+ Math.sin(a*((2*Math.PI)/360))*shield.radius);
+            shield.particles[a].update(elapsedTime);
         }
 
         for (let missile = 0; missile < removeMissiles.length; missile++) {
@@ -515,7 +506,6 @@ Rocket.main = (function(input, logic, graphics, assets) {
 
     function processInput(elapsedTime){
         keyboard.update(elapsedTime);
-        myPlayer.model.position = obstacle();
     }
 
     function drawObjects(object, FOVIndifferent){
@@ -599,9 +589,30 @@ Rocket.main = (function(input, logic, graphics, assets) {
 
         // draw self
         if(myPlayer.model.dead){
-            graphics.draw('tombstone.png', myPlayer.model.position, myPlayer.model.size, myPlayer.model.orientation, true);
+            graphics.draw('tombstone.png', myPlayer.model.position, myPlayer.model.size, myPlayer.model.orientation, false);
         }else{
-            graphics.draw(myPlayer.texture, myPlayer.model.position, myPlayer.model.size, myPlayer.model.orientation, true);
+            myPlayer.sprite.render(myPlayer.model.position, myPlayer.model.orientation);
+            if (myPlayer.model.weapon >= 0) {
+                let vectorX = Math.cos(myPlayer.model.orientation) * (myPlayer.model.radius*1.75);
+                let vectorY = Math.sin(myPlayer.model.orientation) * (myPlayer.model.radius*1.75);
+                let position = {
+                    x: myPlayer.model.position.x + vectorX,
+                    y: myPlayer.model.position.y + vectorY
+                }
+                if (myPlayer.model.weapon){
+                    let size = {
+                        width: .04,
+                        height: .04
+                    }
+                    graphics.draw('bazooka2.png', position, size, myPlayer.model.orientation, false);
+                } else {
+                    let size = {
+                        width: .05,
+                        height: .01
+                    }
+                    graphics.draw('bazooka1.png', position, size, myPlayer.model.orientation, false);
+                }
+            }
         }
         
         for (let tree in treeArray){
@@ -705,8 +716,10 @@ Rocket.main = (function(input, logic, graphics, assets) {
 
         background.setViewport(0.00, 0.00);
         graphics.createImage(myPlayer.texture);
+        graphics.createImage('bunnysheet.png');
         graphics.createImage('carrot.png');
         graphics.createImage('bazooka1.png');
+        graphics.createImage('bazooka2.png');
         graphics.createImage('upgradeWeapon.png');
         graphics.createImage('orangeCarrot.png');
         graphics.createImage('purpleCarrot.png');
