@@ -249,8 +249,9 @@ Rocket.main = (function(input, logic, graphics, assets) {
 
     function updateSelf(data) {
         if(data.hasOwnProperty('winner')) {
-            alert("Congratulations! You are the winner!");
-
+            if(data.winner){
+                alert("Congratulations! You are the winner!");
+            }
         }
         if(data.hasOwnProperty('done')) {
 
