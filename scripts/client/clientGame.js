@@ -865,7 +865,7 @@ Rocket.main = (function(input, logic, graphics, assets) {
                 // messageHistory.enqueue(message);
                 myPlayer.model.moveUp(elapsedTime);
             },
-            Rocket.input.KeyEvent.DOM_VK_W, true);
+            localStorage.getItem("move-up"), true);
 
         keyboard.registerHandler(elapsedTime => {
                 let message = {
@@ -878,7 +878,7 @@ Rocket.main = (function(input, logic, graphics, assets) {
                 // messageHistory.enqueue(message);
                 myPlayer.model.moveDown(elapsedTime);
             },
-            Rocket.input.KeyEvent.DOM_VK_S, true);
+            localStorage.getItem("move-down"), true);
 
         keyboard.registerHandler(elapsedTime => {
                 let message = {
@@ -891,7 +891,7 @@ Rocket.main = (function(input, logic, graphics, assets) {
                 // messageHistory.enqueue(message);
                 myPlayer.model.moveLeft(elapsedTime);
             },
-            Rocket.input.KeyEvent.DOM_VK_A, true);
+            localStorage.getItem("move-left"), true);
 
 
         keyboard.registerHandler(elapsedTime => {
@@ -905,7 +905,7 @@ Rocket.main = (function(input, logic, graphics, assets) {
                 // messageHistory.enqueue(message);
                 myPlayer.model.moveRight(elapsedTime);
             },
-            Rocket.input.KeyEvent.DOM_VK_D, true);
+            localStorage.getItem("move-right"), true);
 
         keyboard.registerHandler(elapsedTime => {
                 let message = {
@@ -918,7 +918,7 @@ Rocket.main = (function(input, logic, graphics, assets) {
                 // messageHistory.enqueue(message);
                 myPlayer.model.rotateRight(elapsedTime);
             },
-            Rocket.input.KeyEvent.DOM_VK_RIGHT, true);
+            localStorage.getItem("rotate-right"), true);
 
         keyboard.registerHandler(elapsedTime => {
                 let message = {
@@ -931,7 +931,7 @@ Rocket.main = (function(input, logic, graphics, assets) {
                 // messageHistory.enqueue(message);
                 myPlayer.model.flipIt(elapsedTime);
             },
-            Rocket.input.KeyEvent.DOM_VK_DOWN, false);
+            localStorage.getItem("flip"), false);
 
         keyboard.registerHandler(elapsedTime => {
                 let message = {
@@ -944,7 +944,7 @@ Rocket.main = (function(input, logic, graphics, assets) {
                 // messageHistory.enqueue(message);
                 myPlayer.model.rotateLeft(elapsedTime);
             },
-            Rocket.input.KeyEvent.DOM_VK_LEFT, true);
+            localStorage.getItem("rotate-left"), true);
 
         keyboard.registerHandler(elapsedTime => {
                 let message = {
@@ -955,8 +955,8 @@ Rocket.main = (function(input, logic, graphics, assets) {
                 };
                 socket.emit(NetworkIds.INPUT, message);
             },
-            Rocket.input.KeyEvent.DOM_VK_UP, false);
-
+            localStorage.getItem("fire"), false);
+        
         network();
         requestAnimationFrame(gameLoop);
     }
