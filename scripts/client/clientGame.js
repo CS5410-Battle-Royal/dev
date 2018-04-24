@@ -1,7 +1,6 @@
 Rocket.main = (function(input, logic, graphics, assets) {
 
     let socketIO = null;
-    let rflying = new Audio('/audio/missileflying.mp3');
     let deadSound = new Audio('/audio/Explosion_03.mp3');
     let beenDead = false;
 
