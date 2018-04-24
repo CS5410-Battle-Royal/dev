@@ -220,7 +220,7 @@ function update(elapsedTime, currentTime) {
     gameTime = (gameTime - elapsedTime/1000);
     if(gameTime < 0 || livingPlayers === 1) {
         endGame();
-        quit = true;
+        gameOver = true;
     }
 
 
@@ -489,12 +489,16 @@ function updateClients(elapsedTime) {
             health: activeUsers[clientId].user.inventory.health,
             weapon: activeUsers[clientId].user.inventory.weapon,
             winner: activeUsers[clientId].user.winner,
-            done: quit
+            done: gameOver
         };
         if (client.user.reportUpdate) {
             update.pickups = getLocalWeapons(client);
             client.socket.emit(NetworkIds.UPDATE_SELF, update);
             client.user.reportUpdate = false;
+        }
+
+        if(gameOver) {
+            quit = true;
         }
 
         for (let otherId in activeUsers) {
