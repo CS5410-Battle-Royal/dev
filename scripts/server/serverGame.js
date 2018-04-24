@@ -29,6 +29,7 @@ let killedPlayers = [];
 let livingPlayers = 0;
 let gameOver = false;
 let gameInProgress = false;
+let io;
 
 function createMissile(userId, user) {
     let timeM, acceleration;
@@ -245,9 +246,12 @@ function endGame() {
 
 function killedPlayer(clientId){
     activeUsers[clientId].user.dead = true;
+    io.emit('log message', clientId + ' has been eliminated');
     activeUsers[clientId].user.inventory.ammo = 0;
     activeUsers[clientId].user.inventory.health = 0;
     livingPlayers--;
+    io.emit('log message', livingPlayers + ' players remaining');
+
 
 }
 
@@ -647,7 +651,7 @@ function gameLoop(currentTime, elapsedTime) {
 //------------------------------------------------------------------
 function initializeSocketIO(http) {
 
-    var io = require('socket.io')(http);
+    io = require('socket.io')(http);
 
     function runCountdown() {
         var target_date = new Date().getTime() + (10*1000);

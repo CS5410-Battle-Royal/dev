@@ -92,12 +92,37 @@
   <div id="id-options" class="container">
 
     <div class="card border-primary mb-3">
+        <script type="text/javascript">
+          function displayunicode(e, id){
+              var unicode=e.keyCode? e.keyCode : e.charCode;
+              //alert(unicode);
+              console.log(unicode, id);
+              localStorage[id] = JSON.stringify(unicode);
+          }
+          function displayKey(e){
+          }
+          </script>
       <h1>Options</h1>
-      <p>No Options Available. Coming soon!</p>
+      <h2>To Change from the default controls select the control you want to change and press the key you would like to change it to.</h2>
+      <p>Move Up  Default: W</p>
+      <input type="text" id="move-up" size="2" maxlength="1" onkeyup= "displayunicode(event, 'move-up'); this.select();">
+      <p>Move Down  Default: S</p>
+      <input type="text" id="move-down" size="2" maxlength="1" onkeyup="displayunicode(event, 'move-down'); this.select()">
+      <p>Move Left  Default: A</p>
+      <input type="text" id="move-left" size="2" maxlength="1" onkeyup="displayunicode(event, 'move-left'); this.select()">
+      <p>Move Right  Default: D</p>
+      <input type="text" id="move-right" size="2" maxlength="1" onkeyup="displayunicode(event, 'move-right'); this.select()">
+      <p>Rotate Left Default: &larr;</p>
+      <input type="text" id="rotate-left" size="2" maxlength="1" onkeyup="displayunicode(event, 'rotate-left'); this.select()">
+      <p>Rotate Right Default: &rarr;</p>
+      <input type="text" id="rotate-right" size="2" maxlength="1" onkeyup="displayunicode(event, 'rotate-right'); this.select()">
+      <p>Fire  Default: &uarr;</p>
+      <input type="text" id="fire" size="2" maxlength="1" onkeyup="displayunicode(event, 'fire'); this.select()">
+      <p>Flip Default:&darr;</p>
+      <input type="text" id="flip" size="2" maxlength="1" onkeyup="displayunicode(event, 'flip'); this.select()">
     </div>
 
     <br>
-
     <button id="button-options-back" class="btn btn-primary">Back</button>
   </div>
 
@@ -108,6 +133,10 @@
     <canvas id = "canvas-main-shield"></canvas>
     <canvas id = "canvas-right"></canvas>
     <canvas id = "canvas-pregame"></canvas>
+    <div id="log-bar" class="card border-primary mb-3 fixed-top fixed-bottom pre-scrollable">
+      <ul id="logmessages" class="list-group"></ul>
+      <br>
+    </div>
 
     <h1 id="h1-id-username"></h1>
     <h1 id="field-clock"></h1>

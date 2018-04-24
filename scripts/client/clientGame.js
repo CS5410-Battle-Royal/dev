@@ -801,7 +801,7 @@ Rocket.main = (function(input, logic, graphics, assets) {
             let rlaunch = new Audio('/audio/rlaunch.mp3');
             rlaunch.play();
         }
-        
+
     }
 
     function playerHitAudio(){
@@ -854,116 +854,116 @@ Rocket.main = (function(input, logic, graphics, assets) {
         graphics.initGraphics();
         createObstacles();
 
-        keyboard.registerHandler(elapsedTime => {
-                let message = {
-                    id: messageId++,
-                    elapsedTime: elapsedTime,
-                    type: NetworkIds.INPUT_MOVE_UP,
-                    userId: userId
-                };
-                socket.emit(NetworkIds.INPUT, message);
-                // messageHistory.enqueue(message);
-                myPlayer.model.moveUp(elapsedTime);
-            },
-            Rocket.input.KeyEvent.DOM_VK_W, true);
+    keyboard.registerHandler(elapsedTime => {
+        let message = {
+            id: messageId++,
+            elapsedTime: elapsedTime,
+            type: NetworkIds.INPUT_MOVE_UP,
+            userId: userId
+        };
+        socket.emit(NetworkIds.INPUT, message);
+        // messageHistory.enqueue(message);
+        myPlayer.model.moveUp(elapsedTime);
+    },
+    localStorage.getItem("move-up"), true);
 
-        keyboard.registerHandler(elapsedTime => {
-                let message = {
-                    id: messageId++,
-                    elapsedTime: elapsedTime,
-                    type: NetworkIds.INPUT_MOVE_DOWN,
-                    userId: userId
-                };
-                socket.emit(NetworkIds.INPUT, message);
-                // messageHistory.enqueue(message);
-                myPlayer.model.moveDown(elapsedTime);
-            },
-            Rocket.input.KeyEvent.DOM_VK_S, true);
+    keyboard.registerHandler(elapsedTime => {
+            let message = {
+                id: messageId++,
+                elapsedTime: elapsedTime,
+                type: NetworkIds.INPUT_MOVE_DOWN,
+                userId: userId
+            };
+            socket.emit(NetworkIds.INPUT, message);
+            // messageHistory.enqueue(message);
+            myPlayer.model.moveDown(elapsedTime);
+        },
+        localStorage.getItem("move-down"), true);
 
-        keyboard.registerHandler(elapsedTime => {
-                let message = {
-                    id: messageId++,
-                    elapsedTime: elapsedTime,
-                    type: NetworkIds.INPUT_MOVE_LEFT,
-                    userId: userId
-                };
-                socket.emit(NetworkIds.INPUT, message);
-                // messageHistory.enqueue(message);
-                myPlayer.model.moveLeft(elapsedTime);
-            },
-            Rocket.input.KeyEvent.DOM_VK_A, true);
+    keyboard.registerHandler(elapsedTime => {
+            let message = {
+                id: messageId++,
+                elapsedTime: elapsedTime,
+                type: NetworkIds.INPUT_MOVE_LEFT,
+                userId: userId
+            };
+            socket.emit(NetworkIds.INPUT, message);
+            // messageHistory.enqueue(message);
+            myPlayer.model.moveLeft(elapsedTime);
+        },
+        localStorage.getItem("move-left"), true);
 
 
-        keyboard.registerHandler(elapsedTime => {
-                let message = {
-                    id: messageId++,
-                    elapsedTime: elapsedTime,
-                    type: NetworkIds.INPUT_MOVE_RIGHT,
-                    userId: userId
-                };
-                socket.emit(NetworkIds.INPUT, message);
-                // messageHistory.enqueue(message);
-                myPlayer.model.moveRight(elapsedTime);
-            },
-            Rocket.input.KeyEvent.DOM_VK_D, true);
+    keyboard.registerHandler(elapsedTime => {
+            let message = {
+                id: messageId++,
+                elapsedTime: elapsedTime,
+                type: NetworkIds.INPUT_MOVE_RIGHT,
+                userId: userId
+            };
+            socket.emit(NetworkIds.INPUT, message);
+            // messageHistory.enqueue(message);
+            myPlayer.model.moveRight(elapsedTime);
+        },
+        localStorage.getItem("move-right"), true);
 
-        keyboard.registerHandler(elapsedTime => {
-                let message = {
-                    id: messageId++,
-                    elapsedTime: elapsedTime,
-                    type: NetworkIds.INPUT_ROTATE_RIGHT,
-                    userId: userId
-                };
-                socket.emit(NetworkIds.INPUT, message);
-                // messageHistory.enqueue(message);
-                myPlayer.model.rotateRight(elapsedTime);
-            },
-            Rocket.input.KeyEvent.DOM_VK_RIGHT, true);
+    keyboard.registerHandler(elapsedTime => {
+            let message = {
+                id: messageId++,
+                elapsedTime: elapsedTime,
+                type: NetworkIds.INPUT_ROTATE_RIGHT,
+                userId: userId
+            };
+            socket.emit(NetworkIds.INPUT, message);
+            // messageHistory.enqueue(message);
+            myPlayer.model.rotateRight(elapsedTime);
+        },
+        localStorage.getItem("rotate-right"), true);
 
-        keyboard.registerHandler(elapsedTime => {
-                let message = {
-                    id: messageId++,
-                    elapsedTime: elapsedTime,
-                    type: NetworkIds.INPUT_FLIP,
-                    userId: userId
-                };
-                socket.emit(NetworkIds.INPUT, message);
-                // messageHistory.enqueue(message);
-                myPlayer.model.flipIt(elapsedTime);
-            },
-            Rocket.input.KeyEvent.DOM_VK_DOWN, false);
+    keyboard.registerHandler(elapsedTime => {
+            let message = {
+                id: messageId++,
+                elapsedTime: elapsedTime,
+                type: NetworkIds.INPUT_FLIP,
+                userId: userId
+            };
+            socket.emit(NetworkIds.INPUT, message);
+            // messageHistory.enqueue(message);
+            myPlayer.model.flipIt(elapsedTime);
+        },
+        localStorage.getItem("flip"), false);
 
-        keyboard.registerHandler(elapsedTime => {
-                let message = {
-                    id: messageId++,
-                    elapsedTime: elapsedTime,
-                    type: NetworkIds.INPUT_ROTATE_LEFT,
-                    userId: userId
-                };
-                socket.emit(NetworkIds.INPUT, message);
-                // messageHistory.enqueue(message);
-                myPlayer.model.rotateLeft(elapsedTime);
-            },
-            Rocket.input.KeyEvent.DOM_VK_LEFT, true);
+    keyboard.registerHandler(elapsedTime => {
+            let message = {
+                id: messageId++,
+                elapsedTime: elapsedTime,
+                type: NetworkIds.INPUT_ROTATE_LEFT,
+                userId: userId
+            };
+            socket.emit(NetworkIds.INPUT, message);
+            // messageHistory.enqueue(message);
+            myPlayer.model.rotateLeft(elapsedTime);
+        },
+        localStorage.getItem("rotate-left"), true);
 
-        keyboard.registerHandler(elapsedTime => {
-                let message = {
-                    id: messageId++,
-                    elapsedTime: elapsedTime,
-                    type: NetworkIds.INPUT_FIRE,
-                    userId: userId
-                };
-                socket.emit(NetworkIds.INPUT, message);
-            },
-            Rocket.input.KeyEvent.DOM_VK_UP, false);
+    keyboard.registerHandler(elapsedTime => {
+            let message = {
+                id: messageId++,
+                elapsedTime: elapsedTime,
+                type: NetworkIds.INPUT_FIRE,
+                userId: userId
+            };
+            socket.emit(NetworkIds.INPUT, message);
+        },
+        localStorage.getItem("fire"), false);
 
-        network();
-        requestAnimationFrame(gameLoop);
-    }
+    network();
+    requestAnimationFrame(gameLoop);
+}
 
-    return {
-        init : init
-    };
+return {
+    init : init
+};
 
 }(Rocket.input, Rocket.logic, Rocket.graphics, Rocket.assets));
 
