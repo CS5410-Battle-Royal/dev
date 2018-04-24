@@ -113,6 +113,46 @@ function processInput(elapsedTime) {
                 }
 
                 break;
+            case NetworkIds.CLICK:
+                let world = {
+                    width: input.message.width,
+                    height: input.message.height
+                };
+                let x = ((input.message.x/world.width)*4);
+                let y = ((input.message.y/world.height)*4);
+                client.user.projected.x = x + .5;
+                client.user.projected.y = y + .5;
+                client.user.worldView.x = x + .5;
+                client.user.worldView.y = y + .5;
+                let view = {
+                    top: y,
+                    left: x,
+                }
+                let position = {
+                    x: .5,
+                    y: .5,
+                }
+                let worldPosition = {
+                    x: position.x + view.left,
+                    y: position.y + view.top
+                }
+                client.socket.emit(NetworkIds.CONNECT_ACK, {
+                    position: position,
+                    view: view,
+                    userId: input.message.userId
+                });
+                for (let clientId in activeUsers) {
+                    let clientOther = activeUsers[clientId];
+                    if (input.message.userId !== clientId) {
+                        // Tell existing about the newly connected player
+                        clientOther.socket.emit(NetworkIds.RECONNECT_OTHER, {
+                            position: worldPosition,
+                            userId: input.message.userId,
+                            orientation: client.user.orientation,
+                        });
+                    }
+                }
+                break;
         }
     }
 }
@@ -374,7 +414,8 @@ function update(elapsedTime, currentTime) {
                 pickups.row[Math.floor(activeUsers[clientId].user.worldView.y)].col[Math.floor(activeUsers[clientId].user.worldView.x)] = keepPickups;
 
                 if(!collided({position:shield,radius:shield.radius},activeUsers[clientId].user)) {
-                    killedPlayer(clientId)               }
+                    killedPlayer(clientId);
+                }
         }
     }
 }

@@ -175,6 +175,11 @@ Rocket.logic.OtherPlayer = function() {
         }
     };
 
+    let map = {
+        x: 0,
+        y: 0
+    }
+
     let goal = {
         orientation: 0,
         position: {
@@ -190,6 +195,11 @@ Rocket.logic.OtherPlayer = function() {
 
     Object.defineProperty(that, 'goal', {
         get: () => goal
+    });
+
+    Object.defineProperty(that, 'map', {
+        get: () => map,
+        set: value => { map = value; }
     });
 
     Object.defineProperty(that, 'size', {
@@ -227,11 +237,12 @@ Rocket.logic.Sprite = function(spec, graphics) {
             height: spec.spriteSize
     };
     let sprite = 0;
+    let isPlayer = spec.me;
     spec.run = 0;
 
     that.render = function(position, orientation) {
         graphics.draw(
-            texture, position, spriteSize, orientation, true, sprite, spriteCount);
+            texture, position, spriteSize, orientation, isPlayer, sprite, spriteCount);
     };
 
     that.update = function(elapsedTime) {
