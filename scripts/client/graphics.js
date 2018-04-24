@@ -21,7 +21,7 @@ Rocket.graphics = (function() {
     let context_mini_shield = canvas_mini_shield.getContext('2d');
     let context_right = canvas_right.getContext('2d');
 
-    let rlaunch = new Audio('rlaunch.mp3');
+
 
 
     let images = {};
@@ -310,7 +310,6 @@ Rocket.graphics = (function() {
         context.lineWidth = 2;
         context.stroke();
         restoreContext();
-
     }
 
     function drawRectangle(position, size, rotation, fill, stroke) {
