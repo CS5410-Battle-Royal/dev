@@ -1,4 +1,7 @@
 
+let sqlite = require('sqlite3');
+let db = new sqlite.Database('users.db');
+
 let connections = 0;
 let TARGET_USERS_NUM = 1;
 let game_started = false;
@@ -55,7 +58,7 @@ function createMissile(userId, user) {
     let missile = Missile.create({
         id: nextMissileId++,
         userId: userId,
-        missileType: user.inventory.weapon,
+        missileType: activeUsers[userId].user.inventory.weapon,
         position: {
             x: user.worldView.x,
             y: user.worldView.y
@@ -232,8 +235,11 @@ function obstacle(user){
 
 function endGame() {
     for (let clientId in activeUsers) {
+        db.run('INSERT INTO highscores(score,user) VALUES (?,?)', [Math.floor(activeUsers[clientId].user.points), clientId]);
+
         if(!activeUsers[clientId].user.dead){
             activeUsers[clientId].user.winner = true;
+            activeUsers[clientId].user.points += 1000;
         }
     }
 }
@@ -249,6 +255,7 @@ function killedPlayer(clientId){
     io.emit('log message', clientId + ' has been eliminated');
     activeUsers[clientId].user.inventory.ammo = 0;
     activeUsers[clientId].user.inventory.health = 0;
+    activeUsers[clientId].user.points += (10*60 - gameTime);
     livingPlayers--;
     io.emit('log message', livingPlayers + ' players remaining');
 
@@ -263,8 +270,11 @@ function killedPlayer(clientId){
 function update(elapsedTime, currentTime) {
     gameTime = (gameTime - elapsedTime/1000);
     if(gameTime < 0 || livingPlayers === 1) {
-        endGame();
+        if(!gameOver){
+            endGame();
+        }
         gameOver = true;
+
     }
 
 
@@ -273,7 +283,7 @@ function update(elapsedTime, currentTime) {
         activeUsers[clientId].user.projected = activeUsers[clientId].user.worldView;
     }
 
-    shield.radius = 4*(gameTime/(10*60));
+    shield.radius = 4.3*(gameTime/(10*60));
     for (let clientId in activeUsers) {
         activeUsers[clientId].user.update(currentTime);
     }
@@ -311,16 +321,21 @@ function update(elapsedTime, currentTime) {
                             direction: activeMissiles[missile].direction
                         });
 
+
                         if(activeMissiles[missile].missileType < 0){
-                            activeUsers[clientId].user.inventory.health -= 1;
-                        }else if(activeMissiles[missile].missileType < 1){
                             activeUsers[clientId].user.inventory.health -= 5;
-                        }else{
+                            activeUsers[activeMissiles[missile].userId].user.points += 5;
+                        }else if(activeMissiles[missile].missileType < 1){
                             activeUsers[clientId].user.inventory.health -= 10;
+                            activeUsers[activeMissiles[missile].userId].user.points += 10;
+                        }else{
+                            activeUsers[clientId].user.inventory.health -= 20;
+                            activeUsers[activeMissiles[missile].userId].user.points += 20;
                         }
 
                         if(activeUsers[clientId].user.inventory.health < 1){
                             killedPlayer(clientId);
+                            activeUsers[activeMissiles[missile].userId].user.points += 500;
                         }
 
                     }
@@ -575,7 +590,7 @@ function updateClients(elapsedTime) {
 function initializeShield() {
     shield.x = Math.random() * 3 + 1;
     shield.y = Math.random() * 3 + 1;
-    shield.radius = 4;
+    shield.radius = 4.3;
 }
 
 function initializePickups() {
@@ -606,7 +621,7 @@ function placePickups() {
     }
 
 
-    for (let i = 0; i < connections; i++) {
+    for (let i = 0; i < connections*1.5; i++) {
         let tempx = Math.random() * (5-2/3) + 1/3;
         let tempy = Math.random() * (5-2/3) + 1/3;
         let tempPosition = {x: tempx, y: tempy};
@@ -614,7 +629,7 @@ function placePickups() {
     }
 
 
-    for (let i = 0; i < connections; i++) {
+    for (let i = 0; i < connections/2; i++) {
         let tempx = Math.random() * (5-2/3) + 1/3;
         let tempy = Math.random() * (5-2/3) + 1/3;
         let tempPosition = {x: tempx, y: tempy};

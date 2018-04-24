@@ -41,6 +41,7 @@ function makePlayer() {
     let reportUpdate = false;
     let dead = false;
     let winner = false;
+    let points = 0;
 
     Object.defineProperty(that, 'reportUpdate', {
         get: () => reportUpdate,
@@ -51,6 +52,10 @@ function makePlayer() {
         set: value => inventory = value
     });
 
+    Object.defineProperty(that, 'points', {
+        get: () => points,
+        set: value => points = value
+    });
     Object.defineProperty(that, 'dead', {
         get: () => dead,
         set: value => dead = value
