@@ -5,13 +5,14 @@ Rocket.main = (function(input, logic, graphics, assets) {
     let keyboard = input.Keyboard(), lastTimeStamp, messageId = 1,
         myPlayer = {
             model: logic.Player(),
-            texture: 'bunny.png',
             sprite: logic.Sprite({
                 spriteSheet: 'bunnysheet.png',
                 spriteCount: 8,
+                me: true,
                 spriteSize: .05,			// Maintain the size on the sprite
             }, graphics)},
         background = null,
+        initialized = false,
         mini = graphics.miniMap(),
         jobQueue = logic.createQueue(),
         otherUsers = [],
@@ -269,20 +270,31 @@ Rocket.main = (function(input, logic, graphics, assets) {
 
     function connectPlayerOther(data) {
         let model = logic.OtherPlayer();
-
         otherUsers[data.userId] = {
             model: model,
-            texture: 'bunny.png'
+            texture: 'bunny.png',
+            sprite: logic.Sprite({
+                spriteSheet: 'bunnysheet.png',
+                spriteCount: 8,
+                me: false,
+                spriteSize: .05,			// Maintain the size on the sprite
+            }, graphics)
         };
     }
 
     function reconnectPlayerOther(data) {
         let model = logic.OtherPlayer();
         model.state.orientation = data.orientation;
-
+        model.map = data.position;
         otherUsers[data.userId] = {
             model: model,
-            texture: 'bunny.png'
+            texture: 'bunny.png',
+            sprite: logic.Sprite({
+                spriteSheet: 'bunnysheet.png',
+                spriteCount: 8,
+                me: false,
+                spriteSize: .05,			// Maintain the size on the sprite
+            }, graphics)
         };
     }
 
@@ -472,8 +484,14 @@ Rocket.main = (function(input, logic, graphics, assets) {
     function update(elapsedTime){
         updateMsgs();
         if (pregame) {
+            if (isNaN(gameCount)){
+                gameCount = 0;
+            }
             gameCount += elapsedTime;
-            if (gameCount > 10000) {
+            if (gameCount > 10000 && !initialized){
+                document.addEventListener("click", printMousePos);
+            }
+            if (gameCount > 20000) {
                 pregame = false;
                 document.removeEventListener("click", printMousePos);
                 update(elapsedTime);
@@ -484,6 +502,7 @@ Rocket.main = (function(input, logic, graphics, assets) {
         myPlayer.model.projected = myPlayer.model.position;
         for (let index in otherUsers){
             otherUsers[index].model.update(elapsedTime);
+            otherUsers[index].sprite.update(elapsedTime);
         }
         myPlayer.sprite.update(elapsedTime);
 
@@ -563,6 +582,18 @@ Rocket.main = (function(input, logic, graphics, assets) {
         graphics.clear();
         if (pregame){
             graphics.drawGame();
+            let myPosition = {
+                x: (myPlayer.model.position.x + background.viewport.left)/5,
+                y: (myPlayer.model.position.y + background.viewport.top)/5,
+            }
+            graphics.drawPeople(myPosition);
+            for (let index in otherUsers){
+                let position = {
+                    x: otherUsers[index].model.map.x/5,
+                    y: otherUsers[index].model.map.y/5
+                }
+                graphics.drawPeople(position);
+            }
             return;
         }
         background.render();
@@ -573,8 +604,9 @@ Rocket.main = (function(input, logic, graphics, assets) {
             let position = drawObjects(object);
             if(!otherUsers[index].model.state.dead){
                 if (position.hasOwnProperty('x')){
-                    graphics.draw(otherUsers[index].texture, position,
-                        otherUsers[index].model.size, otherUsers[index].model.state.orientation, false)
+                    otherUsers[index].sprite.render(position, otherUsers[index].model.state.orientation);
+                    // graphics.draw(otherUsers[index].texture, position,
+                    //     otherUsers[index].model.size, otherUsers[index].model.state.orientation, false)
                 }
             }
         }
@@ -729,11 +761,10 @@ Rocket.main = (function(input, logic, graphics, assets) {
             width: document.getElementById('canvas-pregame').width,
             height: document.getElementById('canvas-pregame').height
         };
-        socketIO.emit(NetworkIds.CLICK, message);
+        socketIO.emit(NetworkIds.INPUT, message);
     }
 
     function init(socket, userId) {
-        document.addEventListener("click", printMousePos);
         myId = userId;
         socketIO = socket;
         background = graphics.TiledImage({
@@ -744,7 +775,7 @@ Rocket.main = (function(input, logic, graphics, assets) {
         });
 
         background.setViewport(0.00, 0.00);
-        graphics.createImage(myPlayer.texture);
+        graphics.createImage('bunny.png');
         graphics.createImage('bunnysheet.png');
         graphics.createImage('2000x2000map.png');
         graphics.createImage('carrot.png');

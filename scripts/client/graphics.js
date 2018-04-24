@@ -53,7 +53,7 @@ Rocket.graphics = (function() {
         }
 
         canvas_pregame.width = canvas.width;
-        canvas_pregame.height = canvas.height;
+        canvas_pregame.height = window.innerHeight;
         canvas_mini.width = world.left;
         canvas_mini.height = canvas.height;
         canvas_mini_shield.width = world.left;
@@ -197,6 +197,17 @@ Rocket.graphics = (function() {
 
         context.restore();
 
+    }
+
+    function drawPeople(center) {
+        context_pregame.save();
+        context_pregame.drawImage(images['bunny.png'], 0, 0,
+            images['bunny.png'].width, images['bunny.png'].height,
+            Math.floor((center.x - (.03 / 2)) * canvas_pregame.width),
+            Math.floor((center.y - (.03 / 2)) * canvas_pregame.height),
+            Math.ceil(.03 * world.size), Math.ceil(.03 * world.size));
+
+        context_pregame.restore();
     }
 
     function drawGame() {
@@ -476,6 +487,7 @@ Rocket.graphics = (function() {
         miniMap: miniMap,
         drawMissile: drawMissile,
         drawGame: drawGame,
+        drawPeople: drawPeople,
         drawRectangle: drawRectangle
     };
 }());
