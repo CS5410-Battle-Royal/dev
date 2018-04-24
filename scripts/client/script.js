@@ -1,4 +1,5 @@
 let userId = '';
+let lobbyMusic = new Audio('/audio/Komiku_-_62_-_The_Challenge.mp3');
 
 document.getElementById('id-signup').hidden = true;
 document.getElementById('id-join').hidden = true;
@@ -105,6 +106,7 @@ document.getElementById('id-newpassword').addEventListener('keydown', passMatch)
 document.getElementById('id-newpassword2').addEventListener('keyup', passMatch)
 
 document.getElementById('button-join').addEventListener('click', function(){
+    lobbyMusic.play();
     document.getElementById('id-chat').hidden = false;
     document.getElementById('id-join').hidden = true;
     socket = io();
@@ -128,6 +130,8 @@ document.getElementById('button-join').addEventListener('click', function(){
         }
 
         if (msg === "countdown finished"){
+            lobbyMusic.pause();
+            lobbyMusic.currentTime = 0;
             document.getElementById('id-game').hidden = false;
             document.getElementById('id-chat').hidden = true;
             document.getElementById('h1-id-username').innerHTML = userId;

@@ -1,6 +1,9 @@
 Rocket.main = (function(input, logic, graphics, assets) {
 
     let socketIO = null;
+    let rflying = new Audio('/audio/missileflying.mp3');
+    let deadSound = new Audio('/audio/Explosion_03.mp3');
+    let beenDead = false;
 
     let keyboard = input.Keyboard(), lastTimeStamp, messageId = 1,
         myPlayer = {
@@ -233,12 +236,14 @@ Rocket.main = (function(input, logic, graphics, assets) {
                     break;
                 case NetworkIds.MISSILE_NEW:
                     missileNew(message.data);
+                    playrlaunch();
                     break;
                 case NetworkIds.MISSILE_HIT:
                     if (!message.data.hitPlayer) {
                         objectHits(message.data);
                     } else {
                         playerHits(message.data);
+                        playerHitAudio();
                     }
                     break;
             }
@@ -248,6 +253,8 @@ Rocket.main = (function(input, logic, graphics, assets) {
     function updateSelf(data) {
         if(data.hasOwnProperty('winner')) {
             if(data.winner){
+                let fanfair = new Audio('/audio/round_end.mp3');
+                fanfair.play();
                 alert("Congratulations! You are the winner!");
             }
         }
@@ -602,6 +609,7 @@ Rocket.main = (function(input, logic, graphics, assets) {
                 if (missiles[missile].particle){
                     missiles[missile].particle.render(background.viewport);
                 }
+                //rflying.play();
             }
         }
         for (let pickup in pickups){
@@ -621,6 +629,11 @@ Rocket.main = (function(input, logic, graphics, assets) {
 
         // draw self
         if(myPlayer.model.dead){
+            if(!beenDead){
+                beenDead = true;
+                deadSound.play();
+            }
+
             graphics.draw('tombstone.png', myPlayer.model.position, myPlayer.model.size, myPlayer.model.orientation, false);
         }else{
             myPlayer.sprite.render(myPlayer.model.position, myPlayer.model.orientation);
@@ -730,6 +743,25 @@ Rocket.main = (function(input, logic, graphics, assets) {
                 id: i+1
             });
         }
+    }
+
+    function playrlaunch(){
+        if(myPlayer.model.weapon<0){
+            let sfx_throw = new Audio('/audio/sfx_throw.mp3');
+            sfx_throw.play();
+        }else if(myPlayer.model.weapon < 1){
+            let iceball = new Audio('/audio/iceball.mp3');
+            iceball.play();
+        }else{
+            let rlaunch = new Audio('/audio/rlaunch.mp3');
+            rlaunch.play();
+        }
+        
+    }
+
+    function playerHitAudio(){
+        let playerHits = new Audio('/audio/Explosion_02.mp3');
+        playerHits.play();
     }
 
     function createObstacles() {
