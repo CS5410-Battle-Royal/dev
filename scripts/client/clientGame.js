@@ -2,6 +2,8 @@ Rocket.main = (function(input, logic, graphics, assets) {
 
     let socketIO = null;
     let rflying = new Audio('/audio/missileflying.mp3');
+    let deadSound = new Audio('/audio/Explosion_03.mp3');
+    let beenDead = false;
 
     let keyboard = input.Keyboard(), lastTimeStamp, messageId = 1,
         myPlayer = {
@@ -241,6 +243,7 @@ Rocket.main = (function(input, logic, graphics, assets) {
                         objectHits(message.data);
                     } else {
                         playerHits(message.data);
+                        playerHitAudio();
                     }
                     break;
             }
@@ -250,6 +253,8 @@ Rocket.main = (function(input, logic, graphics, assets) {
     function updateSelf(data) {
         if(data.hasOwnProperty('winner')) {
             if(data.winner){
+                let fanfair = new Audio('/audio/round_end.mp3');
+                fanfair.play();
                 alert("Congratulations! You are the winner!");
             }
         }
@@ -604,7 +609,7 @@ Rocket.main = (function(input, logic, graphics, assets) {
                 if (missiles[missile].particle){
                     missiles[missile].particle.render(background.viewport);
                 }
-                rflying.play();
+                //rflying.play();
             }
         }
         for (let pickup in pickups){
@@ -624,6 +629,11 @@ Rocket.main = (function(input, logic, graphics, assets) {
 
         // draw self
         if(myPlayer.model.dead){
+            if(!beenDead){
+                beenDead = true;
+                deadSound.play();
+            }
+
             graphics.draw('tombstone.png', myPlayer.model.position, myPlayer.model.size, myPlayer.model.orientation, false);
         }else{
             myPlayer.sprite.render(myPlayer.model.position, myPlayer.model.orientation);
@@ -747,7 +757,12 @@ Rocket.main = (function(input, logic, graphics, assets) {
             rlaunch.play();
         }
         
-        }
+    }
+
+    function playerHitAudio(){
+        let playerHits = new Audio('/audio/Explosion_02.mp3');
+        playerHits.play();
+    }
 
     function createObstacles() {
         makeTrees();
