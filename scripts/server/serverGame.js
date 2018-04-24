@@ -315,7 +315,7 @@ function update(elapsedTime, currentTime) {
                             hitPlayer: true,
                             direction: activeMissiles[missile].direction
                         });
-                        console.log(activeMissiles[missile].missileType)
+                        
 
                         if(activeMissiles[missile].missileType < 0){
                             activeUsers[clientId].user.inventory.health -= 5;
