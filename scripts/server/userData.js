@@ -118,7 +118,7 @@ function makePlayer() {
 
     that.moveDown = function(elapsedTime) {
         reportUpdate = true;
-        if (projected.y + speed * (elapsedTime / 1000) < 5 - (1/3)){
+        if (projected.y + speed * (elapsedTime / 1000) < (5 - (1/3))){
             projected.y += speed * (elapsedTime / 1000);
         }
     };
@@ -132,7 +132,7 @@ function makePlayer() {
 
     that.moveRight = function(elapsedTime) {
         reportUpdate = true;
-        if (projected.x + speed * (elapsedTime / 1000) < 5 - (1/3)){
+        if (projected.x + speed * (elapsedTime / 1000) < (5 - (1/3))){
             projected.x += speed * (elapsedTime / 1000);
         }
     };
