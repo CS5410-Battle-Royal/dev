@@ -283,7 +283,7 @@ function update(elapsedTime, currentTime) {
         activeUsers[clientId].user.projected = activeUsers[clientId].user.worldView;
     }
 
-    shield.radius = 4.3*(gameTime/(10*60));
+    shield.radius = 4*(gameTime/(10*60));
     for (let clientId in activeUsers) {
         activeUsers[clientId].user.update(currentTime);
     }
@@ -590,7 +590,7 @@ function updateClients(elapsedTime) {
 function initializeShield() {
     shield.x = Math.random() * 3 + 1;
     shield.y = Math.random() * 3 + 1;
-    shield.radius = 4.3;
+    shield.radius = 4;
 }
 
 function initializePickups() {
