@@ -591,10 +591,7 @@ Rocket.main = (function(input, logic, graphics, assets) {
         if(myPlayer.model.dead){
             graphics.draw('tombstone.png', myPlayer.model.position, myPlayer.model.size, myPlayer.model.orientation, false);
         }else{
-<<<<<<< HEAD
-            graphics.draw(myPlayer.texture, myPlayer.model.position, myPlayer.model.size, myPlayer.model.orientation, true);
-            graphics.drawHealthReactangle(myPlayer.model.position, myPlayer.model.orientation, 'red');
-=======
+            graphics.drawHealthBar(myPlayer.model.position, myPlayer.model.orientation, 'red');
             myPlayer.sprite.render(myPlayer.model.position, myPlayer.model.orientation);
             if (myPlayer.model.weapon >= 0) {
                 let vectorX = Math.cos(myPlayer.model.orientation) * (myPlayer.model.radius*1.75);
@@ -617,7 +614,6 @@ Rocket.main = (function(input, logic, graphics, assets) {
                     graphics.draw('bazooka1.png', position, size, myPlayer.model.orientation, false);
                 }
             }
->>>>>>> 5f9e55f5050eea4778eb701f96c365c03ca1b244
         }
         
         for (let tree in treeArray){
