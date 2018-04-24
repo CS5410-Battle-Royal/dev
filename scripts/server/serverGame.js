@@ -238,6 +238,7 @@ function endGame() {
 
         if(!activeUsers[clientId].user.dead){
             activeUsers[clientId].user.winner = true;
+            activeUsers[clientId].user.points += 1000;
         }
     }
 }
