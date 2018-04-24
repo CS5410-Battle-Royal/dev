@@ -9,6 +9,7 @@ Rocket.graphics = (function() {
     let canvas_mini = document.getElementById('canvas-mini');
     let canvas_mini_shield = document.getElementById('canvas-mini-shield');
     let canvas_right = document.getElementById('canvas-right');
+    let canvas_pregame = document.getElementById('canvas-pregame');
     let user_name = document.getElementById('h1-id-username');
     let timer = document.getElementById('field-clock');
     let ammo_disp = document.getElementById('ammo-display');
@@ -19,6 +20,7 @@ Rocket.graphics = (function() {
     let context_mini = canvas_mini.getContext('2d');
     let context_mini_shield = canvas_mini_shield.getContext('2d');
     let context_right = canvas_right.getContext('2d');
+    let context_pregame = canvas_pregame.getContext('2d');
 
     let images = {};
     let world = {
@@ -50,6 +52,8 @@ Rocket.graphics = (function() {
             world.left = (canvas.width - world.size) / 2;
         }
 
+        canvas_pregame.width = canvas.width;
+        canvas_pregame.height = canvas.height;
         canvas_mini.width = world.left;
         canvas_mini.height = canvas.height;
         canvas_mini_shield.width = world.left;
@@ -108,6 +112,7 @@ Rocket.graphics = (function() {
         context_mini.clear();
         context_mini_shield.clear();
         context_right.clear();
+        context_pregame.clear();
     }
 
     //------------------------------------------------------------------
@@ -192,6 +197,17 @@ Rocket.graphics = (function() {
 
         context.restore();
 
+    }
+
+    function drawGame() {
+        context_pregame.save();
+
+        context_pregame.drawImage(
+            images['2000x2000map.png'], 0, 0,
+        canvas_pregame.width,
+        canvas_pregame.height);
+
+        context_pregame.restore();
     }
 
     function drawShield(center, view) {
@@ -286,7 +302,7 @@ Rocket.graphics = (function() {
 
     function drawMissile(center, direction, color) {
 
-        saveContext();
+        context.save();
         rotateCanvas(center, direction);
 
         context.beginPath();
@@ -305,12 +321,12 @@ Rocket.graphics = (function() {
 
         context.lineWidth = 2;
         context.stroke();
-        restoreContext();
+        context.restore();
     }
 
     function drawRectangle(position, size, rotation, fill, stroke) {
 
-        saveContext();
+        context.save();
 
         context.fillStyle = fill;
         context.strokeStyle = stroke;
@@ -321,7 +337,7 @@ Rocket.graphics = (function() {
             Math.floor((position.y) * world.size + world.top),
             size*world.size, size*world.size);
 
-        restoreContext();
+        context.restore();
     }
 
     function TiledImage(spec) {
@@ -459,6 +475,7 @@ Rocket.graphics = (function() {
         initGraphics: initGraphics,
         miniMap: miniMap,
         drawMissile: drawMissile,
+        drawGame: drawGame,
         drawRectangle: drawRectangle
     };
 }());

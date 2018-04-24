@@ -107,6 +107,25 @@ function processInput(elapsedTime) {
                 }
 
                 break;
+            case NetworkIds.CLICK:
+                client.user.projected.x = input.message.x;
+                client.user.projected.y = input.message.y;
+                client.user.position.x = input.message.x;
+                client.user.position.y = input.message.y;
+                let view = {
+                    top: client.user.position.y,
+                    left: client.user.position.x,
+                }
+                let position = {
+                    top: .5,
+                    left: .5,
+                }
+                socket.emit(NetworkIds.CONNECT_ACK, {
+                    position: position,
+                    view: view,
+                    userId: input.message.userId
+                });
+                break;
         }
     }
 }

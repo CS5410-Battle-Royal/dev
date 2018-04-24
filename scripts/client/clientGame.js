@@ -17,6 +17,8 @@ Rocket.main = (function(input, logic, graphics, assets) {
         otherUsers = [],
         missiles = {},
         hits = [],
+        pregame = true,
+        gameCount = 0,
         gameTime = 10 * 60, //seconds
         shield = {x:0,y:0,radius:0,particles:[]},
         pickups = [],
@@ -31,7 +33,8 @@ Rocket.main = (function(input, logic, graphics, assets) {
         treeArray = [],
         buildingArray = [],
         treeIndex = [ [1, .5], [.5, 2.75], [1.5, 4.5], [2.3, 2.5], [2.5, 2.3], [3.25, 2], [4.5, 2.5], [3.5, 4]],
-        buildingIndex = [ [1.75, 1], [4, 1], [2.75, 2.75], [4.3, 3]];
+        buildingIndex = [ [1.75, 1], [4, 1], [2.75, 2.75], [4.3, 3]],
+        myId;
 
         for(let a = 0; a < 2*Math.PI; a+=((2*Math.PI)/360)) {
             shield.particles.push(logic.ParticleSystem({
@@ -468,6 +471,14 @@ Rocket.main = (function(input, logic, graphics, assets) {
 
     function update(elapsedTime){
         updateMsgs();
+        if (pregame) {
+            gameCount += elapsedTime;
+            if (gameCount > 10000) {
+                pregame = false;
+                document.removeEventListener("click", printMousePos);
+                update(elapsedTime);
+            }
+        }
         shiftView(myPlayer.model.position, elapsedTime);
         myPlayer.model.position = obstacle();
         myPlayer.model.projected = myPlayer.model.position;
@@ -550,6 +561,10 @@ Rocket.main = (function(input, logic, graphics, assets) {
 
     function render(){
         graphics.clear();
+        if (pregame){
+            graphics.drawGame();
+            return;
+        }
         background.render();
 
         for (let index in otherUsers){
@@ -642,7 +657,6 @@ Rocket.main = (function(input, logic, graphics, assets) {
         document.getElementById('field-clock').innerHTML = gameClock(gameTime);
         document.getElementById('health-display').innerHTML = "Health: " + myPlayer.model.health;
         document.getElementById('ammo-display').innerHTML = "Ammo: " + myPlayer.model.ammo;
-        // console.log("Ammo: " + myPlayer.model.ammo);
     }
 
     function gameLoop(time) {
@@ -705,7 +719,22 @@ Rocket.main = (function(input, logic, graphics, assets) {
         makeBuildings();
     }
 
+    function printMousePos(event) {
+        let message = {
+            id: messageId++,
+            type: NetworkIds.CLICK,
+            userId: myId,
+            x: event.clientX,
+            y: event.clientY,
+            width: document.getElementById('canvas-pregame').width,
+            height: document.getElementById('canvas-pregame').height
+        };
+        socketIO.emit(NetworkIds.CLICK, message);
+    }
+
     function init(socket, userId) {
+        document.addEventListener("click", printMousePos);
+        myId = userId;
         socketIO = socket;
         background = graphics.TiledImage({
             pixel: { width: assets['background'].width, height: assets['background'].height },
@@ -717,6 +746,7 @@ Rocket.main = (function(input, logic, graphics, assets) {
         background.setViewport(0.00, 0.00);
         graphics.createImage(myPlayer.texture);
         graphics.createImage('bunnysheet.png');
+        graphics.createImage('2000x2000map.png');
         graphics.createImage('carrot.png');
         graphics.createImage('bazooka1.png');
         graphics.createImage('bazooka2.png');
