@@ -616,7 +616,7 @@ function placePickups() {
     }
 
 
-    for (let i = 0; i < connections; i++) {
+    for (let i = 0; i < connections*1.5; i++) {
         let tempx = Math.random() * (5-2/3) + 1/3;
         let tempy = Math.random() * (5-2/3) + 1/3;
         let tempPosition = {x: tempx, y: tempy};
@@ -624,7 +624,7 @@ function placePickups() {
     }
 
 
-    for (let i = 0; i < connections; i++) {
+    for (let i = 0; i < connections/2; i++) {
         let tempx = Math.random() * (5-2/3) + 1/3;
         let tempy = Math.random() * (5-2/3) + 1/3;
         let tempPosition = {x: tempx, y: tempy};
