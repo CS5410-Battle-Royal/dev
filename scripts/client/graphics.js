@@ -11,9 +11,9 @@ Rocket.graphics = (function() {
     let canvas_right = document.getElementById('canvas-right');
     let user_name = document.getElementById('h1-id-username');
     let timer = document.getElementById('field-clock');
+
     let ammo_disp = document.getElementById('ammo-display');
     let health_disp = document.getElementById('health-display');
-    
 
     let context = canvas.getContext('2d');
     let context_shield = canvas_shield.getContext('2d');
@@ -61,23 +61,12 @@ Rocket.graphics = (function() {
         canvas_right.width = world.left;
         canvas_right.height = canvas.height;
         canvas_right.style.left = (world.size + world.left).toString() + "px";
-        
         user_name.style.left = (canvas_mini.width/100).toString() + "px";
+        timer.style.left = (canvas_mini.width/100).toString() + "px";
         user_name.style.top = (canvas_mini.width).toString() + "px";
         user_name.style.fontSize = (canvas_mini.width/6).toString() + "px";
-        
-        timer.style.left = (canvas_mini.width/100).toString() + "px";
         timer.style.top = (canvas_mini.width + (canvas_mini.width/6)).toString() + "px";
         timer.style.fontSize = (canvas_mini.width/6).toString() + "px";
-
-        health_disp.style.left = (canvas_mini.width/100).toString() + "px";
-        health_disp.style.top = (canvas_mini.width + (canvas_mini.width/6) + (canvas_mini.width/6)).toString() + "px";
-        health_disp.style.fontSize = (canvas_mini.width/6).toString() + "px";
-
-        ammo_disp.style.left = (canvas_mini.width/100).toString() + "px";
-        ammo_disp.style.top = (canvas_mini.width + (canvas_mini.width/6) + (canvas_mini.width/6) + (canvas_mini.width/6)).toString() + "px";
-        ammo_disp.style.fontSize = (canvas_mini.width/6).toString() + "px";
-
     }
 
     function initGraphics() {
@@ -327,6 +316,51 @@ Rocket.graphics = (function() {
 
         restoreContext();
     }
+    function drawHealthRectangle(center, direction, color){
+        saveContext();
+        var that = {},
+            healthBarHeight = 0.006;
+    
+        // ------------------------------------------------------------------
+        //
+        // Renders a Healthbar model.  Because the model can be rotated, that needs
+        // to be done here, because the underlying sprite doesn't know
+        // anything about rotation.
+        //
+        // ------------------------------------------------------------------
+        that.render = function(spec) {
+            var percentGreen = spec.hitPoints.strength / spec.hitPoints.max;
+    
+            saveContext();
+            rotateCanvas(center, direction);
+    
+            //
+            // Render a little bar above the bunny that represents the health
+
+            drawRectangle(
+                'rgba(0, 0, 0, 255)',
+                Math.floor((center.x - .007)* world.size + world.left),
+                Math.floor((center.y - .007) * world.size + world.top) - .02,
+                true);
+    
+            //
+            // Fill the whole thing with red
+            drawFilledRectangle(
+                'rgba(255, 0, 0, 255)',
+                Math.floor((center.x - .007)* world.size + world.left),
+                Math.floor((center.y - .007) * world.size + world.top) - .02,
+                true);
+    
+            //
+            // Cover up with the green portion
+            drawFilledRectangle(
+                'rgba(0, 255, 0, 255)',
+                model.center.x - model.size.width / 2, model.center.y - (model.size.height / 2 + healthBarHeight * 2),
+                model.size.width * percentGreen, healthBarHeight,
+                true);
+        }
+        restoreContext();
+    }
 
     function TiledImage(spec) {
         var RENDER_POS_EPISILON = 0.00001;
@@ -463,6 +497,7 @@ Rocket.graphics = (function() {
         initGraphics: initGraphics,
         miniMap: miniMap,
         drawMissile: drawMissile,
-        drawRectangle: drawRectangle
+        drawRectangle: drawRectangle,
+        drawHealthRectangle: drawHealthRectangle
     };
 }());
