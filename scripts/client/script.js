@@ -8,6 +8,14 @@ document.getElementById('id-game').hidden = true;
 document.getElementById('min-players').hidden = true;
 document.getElementById('id-highscores').hidden = true;
 document.getElementById('id-options').hidden = true;
+localStorage["move-up"] = JSON.stringify(65);
+localStorage["move-down"] = JSON.stringify(83);
+localStorage["move-left"] = JSON.stringify(65);
+localStorage["move-right"] = JSON.stringify(68);
+localStorage["rotate-left"] = JSON.stringify(37);
+localStorage["rotate-right"] = JSON.stringify(39);
+localStorage["fire"] = JSON.stringify(38);
+localStorage["flip"] = JSON.stringify(40);
 let socket;
 let Rocket = {
     input: {},
