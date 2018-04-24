@@ -7,6 +7,7 @@ let path=require('path');
 let game_server_side = require('./scripts/server/serverGame');
 var bodyParser = require('body-parser');
 
+
 let app = express();
 let http = require('http').Server(app);
 
@@ -74,6 +75,17 @@ app.post('/signup', function(request, response) {
   })
 });
 
+
+app.get('/highscores/clear', function(request, response) {
+  db.all('DELETE FROM highscores', (err) =>{
+    if(err){
+      response.json({error:err});
+    } else{
+      response.json({msg: 'success'});
+    }
+  });
+});
+
 app.get('/highscores/add/:score/:user', function(request, response) {
 
   db.run('INSERT INTO highscores(score,user) VALUES (?,?)', [request.params['score'], request.params['user']],function(err, row){
@@ -84,6 +96,8 @@ app.get('/highscores/add/:score/:user', function(request, response) {
     }
   })
 });
+
+
 
 app.get('/highscores', function(request, response){
   db.all('SELECT * FROM highscores ORDER BY score DESC', (err, rows) => {
