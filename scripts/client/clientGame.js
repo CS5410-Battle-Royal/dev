@@ -801,7 +801,7 @@ Rocket.main = (function(input, logic, graphics, assets) {
             let rlaunch = new Audio('/audio/rlaunch.mp3');
             rlaunch.play();
         }
-        
+
     }
 
     function playerHitAudio(){
@@ -956,14 +956,14 @@ Rocket.main = (function(input, logic, graphics, assets) {
                 socket.emit(NetworkIds.INPUT, message);
             },
             localStorage.getItem("fire"), false);
-        
+
         network();
         requestAnimationFrame(gameLoop);
     }
 
-    return {
-        init : init
-    };
+return {
+    init : init
+};
 
 }(Rocket.input, Rocket.logic, Rocket.graphics, Rocket.assets));
 

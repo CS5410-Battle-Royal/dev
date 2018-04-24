@@ -103,7 +103,7 @@
 
           }
           </script>
-      <h1>Options</h1> 
+      <h1>Options</h1>
       <h2>To Change from the default controls select the control you want to change and press the key you would like to change it to.</h2>
       <p>Move Up  Default: W</p>
       <input type="text" id="move-up" size="2" maxlength="1" onkeyup= "displayunicode(event, 'move-up'); this.select();">
@@ -124,7 +124,6 @@
     </div>
 
     <br>
-
     <button id="button-options-back" class="btn btn-primary">Back</button>
   </div>
 
@@ -135,6 +134,10 @@
     <canvas id = "canvas-main-shield"></canvas>
     <canvas id = "canvas-right"></canvas>
     <canvas id = "canvas-pregame"></canvas>
+    <div id="log-bar" class="card border-primary mb-3 fixed-top fixed-bottom pre-scrollable">
+      <ul id="logmessages" class="list-group"></ul>
+      <br>
+    </div>
 
     <h1 id="h1-id-username"></h1>
     <h1 id="field-clock"></h1>

@@ -14,6 +14,7 @@ Rocket.graphics = (function() {
     let timer = document.getElementById('field-clock');
     let ammo_disp = document.getElementById('ammo-display');
     let health_disp = document.getElementById('health-display');
+    let log_bar = document.getElementById('log-bar');
 
     let context = canvas.getContext('2d');
     let context_shield = canvas_shield.getContext('2d');
@@ -61,11 +62,11 @@ Rocket.graphics = (function() {
         canvas_right.width = world.left;
         canvas_right.height = canvas.height;
         canvas_right.style.left = (world.size + world.left).toString() + "px";
-        
+
         user_name.style.left = (canvas_mini.width/100).toString() + "px";
         user_name.style.top = (canvas_mini.width).toString() + "px";
         user_name.style.fontSize = (canvas_mini.width/6).toString() + "px";
-        
+
         timer.style.left = (canvas_mini.width/100).toString() + "px";
         timer.style.top = (canvas_mini.width + (canvas_mini.width/6)).toString() + "px";
         timer.style.fontSize = (canvas_mini.width/6).toString() + "px";
@@ -77,6 +78,10 @@ Rocket.graphics = (function() {
         ammo_disp.style.left = (canvas_mini.width/100).toString() + "px";
         ammo_disp.style.top = (canvas_mini.width + (canvas_mini.width/6) + (canvas_mini.width/6) + (canvas_mini.width/6)).toString() + "px";
         ammo_disp.style.fontSize = (canvas_mini.width/6).toString() + "px";
+
+        log_bar.width = world.left;
+        log_bar.height = canvas.height;
+        log_bar.style.left = (world.size + world.left).toString() + "px";
 
     }
 

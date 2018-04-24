@@ -65,3 +65,8 @@
     top: 0px;
     left: 0px;
 }
+
+#log-bar {
+    background-color: transparent;
+    z-index: 3;
+}

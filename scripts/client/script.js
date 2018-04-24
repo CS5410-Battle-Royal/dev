@@ -8,7 +8,7 @@ document.getElementById('id-game').hidden = true;
 document.getElementById('min-players').hidden = true;
 document.getElementById('id-highscores').hidden = true;
 document.getElementById('id-options').hidden = true;
-localStorage["move-up"] = JSON.stringify(65);
+localStorage["move-up"] = JSON.stringify(87);
 localStorage["move-down"] = JSON.stringify(83);
 localStorage["move-left"] = JSON.stringify(65);
 localStorage["move-right"] = JSON.stringify(68);
@@ -156,6 +156,16 @@ document.getElementById('button-join').addEventListener('click', function(){
         document.getElementById("messages").appendChild(node);
         document.getElementById("chat-bar").scrollTop = document.getElementById("chat-bar").scrollHeight;
     });
+    socket.on('log message', function(msg){
+      var node = document.createElement("li");
+      var br = document.createElement("br");
+      var textnode = document.createTextNode(msg);
+      node.appendChild(textnode);
+      node.appendChild(br);
+      node.className = "list-group-item justify-content-between align-items-center";
+      document.getElementById("logmessages").appendChild(node);
+      document.getElementById("log-bar").scrollTop = document.getElementById("log-bar").scrollHeight;
+  });
 });
 
 document.getElementById('button-chat').addEventListener('click', function(){

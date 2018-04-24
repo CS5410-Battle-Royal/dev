@@ -32,6 +32,7 @@ let killedPlayers = [];
 let livingPlayers = 0;
 let gameOver = false;
 let gameInProgress = false;
+let io;
 
 function createMissile(userId, user) {
     let timeM, acceleration;
@@ -251,10 +252,13 @@ function endGame() {
 
 function killedPlayer(clientId){
     activeUsers[clientId].user.dead = true;
+    io.emit('log message', clientId + ' has been eliminated');
     activeUsers[clientId].user.inventory.ammo = 0;
     activeUsers[clientId].user.inventory.health = 0;
     activeUsers[clientId].user.points += (10*60 - gameTime);
     livingPlayers--;
+    io.emit('log message', livingPlayers + ' players remaining');
+
 
 }
 
@@ -279,7 +283,7 @@ function update(elapsedTime, currentTime) {
         activeUsers[clientId].user.projected = activeUsers[clientId].user.worldView;
     }
 
-    shield.radius = 4.3*(gameTime/(10*60));
+    shield.radius = 4*(gameTime/(10*60));
     for (let clientId in activeUsers) {
         activeUsers[clientId].user.update(currentTime);
     }
@@ -586,7 +590,7 @@ function updateClients(elapsedTime) {
 function initializeShield() {
     shield.x = Math.random() * 3 + 1;
     shield.y = Math.random() * 3 + 1;
-    shield.radius = 4.3;
+    shield.radius = 4;
 }
 
 function initializePickups() {
@@ -662,7 +666,7 @@ function gameLoop(currentTime, elapsedTime) {
 //------------------------------------------------------------------
 function initializeSocketIO(http) {
 
-    var io = require('socket.io')(http);
+    io = require('socket.io')(http);
 
     function runCountdown() {
         var target_date = new Date().getTime() + (10*1000);
