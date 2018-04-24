@@ -72,6 +72,10 @@
             value: 'update-self',
             writable: false
         },
+        'CLICK': {
+            value: 'click',
+            writable: false
+        },
         'UPDATE_OTHER': {
             value: 'update-other',
             writable: false
