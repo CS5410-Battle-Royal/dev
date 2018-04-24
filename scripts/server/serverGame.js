@@ -57,7 +57,7 @@ function createMissile(userId, user) {
     let missile = Missile.create({
         id: nextMissileId++,
         userId: userId,
-        missileType: user.inventory.weapon,
+        missileType: activeUsers[userId].user.inventory.weapon,
         position: {
             x: user.worldView.x,
             y: user.worldView.y
