@@ -47,7 +47,7 @@ Rocket.main = (function(input, logic, graphics, assets) {
                 theta: Math.PI
                 }, graphics)
             )
-        }       
+        }
 
     function network() {
         socketIO.on(NetworkIds.CONNECT_ACK, data => {
@@ -246,6 +246,34 @@ Rocket.main = (function(input, logic, graphics, assets) {
     }
 
     function updateSelf(data) {
+        if(data.hasOwnProperty('winner')) {
+            alert("Congratulations! You are the winner!");
+
+        }
+        if(data.hasOwnProperty('done')) {
+
+                document.getElementById('id-highscores').hidden = false;
+                document.getElementById('id-game').hidden = true;
+
+                let req = new XMLHttpRequest();
+                req.responseType = 'json';
+                req.open("GET", "/highscores");
+                req.onload  = function() {
+                  var rows = req.response;
+                  // do something with jsonResponse
+                  document.getElementById('id-scores-list').innerHTML = "";
+                  for(var row in rows){
+                    var node = document.createElement("li");
+                    var rowString = parseInt(row) + 1;
+                    var textnode = document.createTextNode(rowString + ". " + rows[row].score + " - " + rows[row].user);
+                    node.appendChild(textnode);
+                    node.className = "list-group-item"
+                    //node.className = "list-group-item justify-content-between align-items-center";
+                    document.getElementById("id-scores-list").appendChild(node);
+                  }
+               };
+                req.send();
+        }
         if (data.hasOwnProperty('weapon')){
             myPlayer.model.weapon = data.weapon;
         }
@@ -495,7 +523,8 @@ Rocket.main = (function(input, logic, graphics, assets) {
         }
 
         for(let a = 0; a < shield.particles.length; a++) {
-            shield.particles[a].setPosition(shield.x+ Math.cos(a*((2*Math.PI)/360))*shield.radius,shield.y+ Math.sin(a*((2*Math.PI)/360))*shield.radius);
+            let angle = a*(2*Math.PI/360);
+            shield.particles[a].setPosition(shield.x+ Math.cos(angle)*shield.radius,shield.y+ Math.sin(angle)*shield.radius);
             shield.particles[a].update(elapsedTime);
         }
 
@@ -615,7 +644,7 @@ Rocket.main = (function(input, logic, graphics, assets) {
                 }
             }
         }
-        
+
         for (let tree in treeArray){
             let position = drawObjects(treeArray[tree].model.position, true);
             if (position.hasOwnProperty('x')){
@@ -623,13 +652,13 @@ Rocket.main = (function(input, logic, graphics, assets) {
                     treeArray[tree].model.size, treeArray[tree].model.orientation, false)
             }
         }
-        
+
         for (let index in hits){
             hits[index].particle.render(background.viewport);
         }
         graphics.drawShield(shield, background.viewport);
 
-        for (let particle in shield.particles) {
+        for (let particle = 0; particle<shield.particles.length; particle += (5-Math.ceil(shield.radius))) {
             let position = drawObjects(shield.particles[particle].position, true);
             if (position.hasOwnProperty('x')){
                 shield.particles[particle].render(background.viewport)
