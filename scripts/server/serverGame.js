@@ -28,9 +28,23 @@ let pickups = {};
 let killedPlayers = [];
 
 function createMissile(userId, user) {
-    let timeM;
+    let timeM, acceleration;
+    switch (user.inventory.weapon){
+        case 1:
+            timeM = 1500;
+            acceleration = 1.013;
+            break;
+        case 0:
+            timeM = 1500;
+            acceleration = 1;
+            break;
+        default:
+        case -1:
+            timeM = 200;
+            acceleration = 1;
+            break;
+    }
     if(user.inventory.weapon < 0){
-        timeM = 200;
     }else{
         timeM = 1500;
     }
@@ -43,6 +57,7 @@ function createMissile(userId, user) {
             y: user.worldView.y
         },
         direction: user.orientation,
+        acceleration: acceleration,
         speed: user.speed,
         time: timeM
     });
@@ -135,7 +150,6 @@ function obstacle(user){
         };
 
         if (collided(treePosition, newCenter)) {
-            console.log('tree')
             let deltaX = user.worldView.x - treePosition.position.x;
             let deltaY = (treePosition.position.y + treePosition.radius) - user.worldView.y;
             let objDir = Math.atan2(deltaY, deltaX);
@@ -148,7 +162,6 @@ function obstacle(user){
     }
 
     for (let index in buildings.buildingArray){
-        console.log('building')
         let buildingPosition = {
             position: {
                 x: buildings.buildingArray[index].model.position.x,
@@ -454,6 +467,7 @@ function updateClients(elapsedTime) {
             shield: shield,
             dead: activeUsers[clientId].user.dead,
             ammo: activeUsers[clientId].user.inventory.ammo,
+            weapon: activeUsers[clientId].user.inventory.weapon,
             health: activeUsers[clientId].user.inventory.health
         };
         if (client.user.reportUpdate) {

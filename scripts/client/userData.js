@@ -216,6 +216,41 @@ Rocket.logic.OtherPlayer = function() {
     return that;
 };
 
+Rocket.logic.Sprite = function(spec, graphics) {
+    let that = {};
+
+    let texture = spec.spriteSheet;
+    let spriteCount = spec.spriteCount;
+    let spriteTime = [100, 100, 100, 100, 100, 100, 100, 100];
+    let spriteSize = {
+            width: spec.spriteSize,
+            height: spec.spriteSize
+    };
+    let sprite = 0;
+    spec.run = 0;
+
+    that.render = function(position, orientation) {
+        graphics.draw(
+            texture, position, spriteSize, orientation, true, sprite, spriteCount);
+    };
+
+    that.update = function(elapsedTime) {
+        if (isNaN(spec.run)){
+            spec.run = 0;
+        }
+        spec.run += elapsedTime;
+        //
+        // Check to see if we should update the animation frame
+        if (spec.run >= spriteTime[sprite]) {
+            spec.run -= spriteTime[sprite];
+            sprite += 1;
+            sprite = sprite % spriteCount;
+        }
+    };
+
+    return that;
+};
+
 Rocket.logic.Missile = function(spec) {
     let that = {};
 
