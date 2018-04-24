@@ -217,7 +217,7 @@ function killedPlayer(clientId){
 //
 //------------------------------------------------------------------
 function update(elapsedTime, currentTime) {
-    gameTime = (gameTime - 10*elapsedTime/1000);
+    gameTime = (gameTime - elapsedTime/1000);
     if(gameTime < 0 || livingPlayers === 1) {
         endGame();
         quit = true;
@@ -620,9 +620,7 @@ function initializeSocketIO(http) {
                 pastSeconds = seconds;
             }
             if (seconds === 0){
-                if(!gameInProgress){
-                    io.emit('start game', 'countdown finished');
-                }
+                io.emit('start game', 'countdown finished');
                 clearInterval(refresh);
                 reconnection = true;
                 gameTime = 10 * 60;
