@@ -13,12 +13,16 @@ Rocket.graphics = (function() {
     let timer = document.getElementById('field-clock');
     let ammo_disp = document.getElementById('ammo-display');
     let health_disp = document.getElementById('health-display');
+    
 
     let context = canvas.getContext('2d');
     let context_shield = canvas_shield.getContext('2d');
     let context_mini = canvas_mini.getContext('2d');
     let context_mini_shield = canvas_mini_shield.getContext('2d');
     let context_right = canvas_right.getContext('2d');
+
+    let rlaunch = new Audio('rlaunch.mp3');
+
 
     let images = {};
     let world = {
@@ -309,6 +313,7 @@ Rocket.graphics = (function() {
         context.lineWidth = 2;
         context.stroke();
         restoreContext();
+
     }
 
     function drawRectangle(position, size, rotation, fill, stroke) {

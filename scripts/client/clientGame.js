@@ -20,14 +20,11 @@ Rocket.main = (function(input, logic, graphics, assets) {
             height: 5,
             width: 5
         },
-        OBSTACLE_COUNT = {
-            treeNum: 8,
-            buildingNum: 4
+        Trees = {
+            num: 8
         },
         treeArray = [],
-        buildingArray = [],
-        treeIndex = [ [1, .5], [.5, 2.75], [1.5, 4.5], [2.3, 2.5], [2.5, 2.3], [3.25, 2], [4.5, 2.5], [3.5, 4]],
-        buildingIndex = [ [1.75, 1], [4, 1], [2.75, 2.75], [4.3, 3]];
+        treeIndex = [ [1, .5], [.5, 2.75], [1.5, 4.5], [2.3, 2.5], [2.5, 2.3], [3.25, 2], [4.5, 2.5], [3.5, 4]];
 
         for(let a = 0; a < 2*Math.PI; a+=((2*Math.PI)/360)) {
             shield.particles.push(logic.ParticleSystem({
@@ -229,6 +226,7 @@ Rocket.main = (function(input, logic, graphics, assets) {
                     break;
                 case NetworkIds.MISSILE_NEW:
                     missileNew(message.data);
+                    playrlaunch();
                     break;
                 case NetworkIds.MISSILE_HIT:
                     if (!message.data.hitPlayer) {
@@ -436,32 +434,6 @@ Rocket.main = (function(input, logic, graphics, assets) {
                 }
             }
         }
-
-        for (let index in buildingArray){
-            let position = drawObjects(buildingArray[index].model.position, true);
-            if (position.hasOwnProperty('x')) {
-                let buildingPosition = {
-                    position: {
-                        x: position.x,
-                        y: position.y
-                    },
-                    radius: buildingArray[index].model.radius,
-                    type: 'building'
-                };
-
-                if (collided(buildingPosition , newCenter)) {
-                    let deltaX = myPlayer.model.position.x - buildingPosition .position.x;
-                    let deltaY = buildingPosition.position.y - myPlayer.model.position.y;
-                    let objDir = Math.atan2(deltaY, deltaX);
-                    let vectorX = Math.cos(objDir) * (buildingPosition.radius + myPlayer.model.radius);
-                    let vectorY = Math.sin(objDir) * (buildingPosition.radius + myPlayer.model.radius);
-
-                    newCenter.position.x = buildingPosition.position.x + vectorX;
-                    newCenter.position.y = buildingPosition.position.y - vectorY;
-                }
-            }
-        }
-
         return newCenter.position;
     }
 
@@ -490,6 +462,7 @@ Rocket.main = (function(input, logic, graphics, assets) {
             }
         }
 
+        // missiles
         let removeMissiles = [];
         for (let missile in missiles) {
             if (!missiles[missile].update(elapsedTime)) {
@@ -500,9 +473,8 @@ Rocket.main = (function(input, logic, graphics, assets) {
             }
         }
 
+        // sheild
         for(let a = 0; a < shield.particles.length; a++) {
-            // let position = drawObjects(shield.particles[a].position, true);
-            // if (position.hasOwnProperty('x')){
                 shield.particles[a].setPosition(shield.x+ Math.cos(a*((2*Math.PI)/360))*shield.radius,shield.y+ Math.sin(a*((2*Math.PI)/360))*shield.radius);
                 shield.particles[a].update(elapsedTime);
             // }
@@ -589,14 +561,6 @@ Rocket.main = (function(input, logic, graphics, assets) {
             }
         }
 
-        for (let building in buildingArray){
-            let position = drawObjects(buildingArray[building].model.position, true);
-            if (position.hasOwnProperty('x')){
-                graphics.draw(buildingArray[building].texture, position,
-                    buildingArray[building].model.size, buildingArray[building].model.orientation, false)
-            }
-        }
-
         // draw self
         if(myPlayer.model.dead){
             graphics.draw('tombstone.png', myPlayer.model.position, myPlayer.model.size, myPlayer.model.orientation, true);
@@ -631,7 +595,11 @@ Rocket.main = (function(input, logic, graphics, assets) {
         document.getElementById('field-clock').innerHTML = gameClock(gameTime);
         document.getElementById('health-display').innerHTML = "Health: " + myPlayer.model.health;
         document.getElementById('ammo-display').innerHTML = "Ammo: " + myPlayer.model.ammo;
-        // console.log("Ammo: " + myPlayer.model.ammo);
+
+
+        // play audio
+
+        
     }
 
     function gameLoop(time) {
@@ -646,7 +614,7 @@ Rocket.main = (function(input, logic, graphics, assets) {
     };
 
     function makeTrees() {
-        for (let i = 0; i < OBSTACLE_COUNT.treeNum; i++){
+        for (let i = 0; i < Trees.num; i++){
             treeArray.push( {
                 model: {
                     position : {
@@ -667,33 +635,14 @@ Rocket.main = (function(input, logic, graphics, assets) {
         }
     }
 
-    function makeBuildings() {
-        for (let i = 0; i < OBSTACLE_COUNT.buildingNum; i++){
-            buildingArray.push( {
-                model: {
-                    position : {
-                        x: buildingIndex[i][0],
-                        y: buildingIndex[i][1]
-                    },
-                    size: {
-                        height: .5,
-                        width: .5
-                    },
-                    radius: .25,
-                    orientation: 0,
-                    type: 'building'
-                },
-                texture: 'barn.png',
-                id: i+1
-            });
-        }
-    }
-
     function createObstacles() {
         makeTrees();
-        makeBuildings();
     }
 
+    function playrlaunch(){
+        let rlaunch = new Audio('/audio/rlaunch.mp3');
+        rlaunch.play();
+    }
     function init(socket, userId) {
         socketIO = socket;
         background = graphics.TiledImage({
@@ -712,7 +661,7 @@ Rocket.main = (function(input, logic, graphics, assets) {
         graphics.createImage('purpleCarrot.png');
         graphics.createImage('explode.png');
         graphics.createImage('trees.png');
-        graphics.createImage('barn.png');
+
         graphics.createImage('tombstone.png');
         graphics.initGraphics();
         createObstacles();
