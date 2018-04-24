@@ -139,29 +139,43 @@ Rocket.graphics = (function() {
     // Draw an image into the local canvas coordinate system.
     //
     //------------------------------------------------------------------
-    function draw(texture, center, size, orientation, me) {
+    function draw(texture, center, size, orientation, me, px_spot, sprite_cnt) {
         context.save();
 
+        if (px_spot === undefined) {
+            px_spot = 0;
+        }
+
+        if (sprite_cnt === undefined) {
+            sprite_cnt = 1;
+        }
+
+        if (me){
+            orientation -= (Math.PI/2);
+        }
+
         rotateCanvas(center, orientation);
-        // console.log(texture);
 
-        context.drawImage(images[texture], 0, 0, images[texture].width, images[texture].height,
-            Math.floor((center.x - size.width / 2) * world.size + world.left),
-            Math.floor((center.y - size.height / 2) * world.size + world.top),
-            Math.ceil(size.width * world.size), Math.ceil(size.height * world.size));
-
+        //fov
         if (me){
             context.globalAlpha = .15;
             context.beginPath();
             context.arc(Math.floor((center.x - size.width / 2) * world.size + world.left) + (size.width * world.size/2),
                 Math.floor((center.y - size.height / 2) * world.size + world.top) + (size.width * world.size/2),
-                world.size*(.943), Math.PI*(13/8), Math.PI*(3/8), true);
+                world.size*(.943), Math.PI*(1/8), Math.PI*(7/8), true);
             context.lineTo(Math.floor((center.x - size.width / 2) * world.size + world.left) + (size.width * world.size/2),
                 Math.floor((center.y - size.height / 2) * world.size + world.top) + (size.width * world.size/2));
             context.fillStyle = 'gray';
             context.fill();
             context.stroke();
         }
+
+        context.globalAlpha = 1;
+        context.drawImage(images[texture], px_spot*(images[texture].width/sprite_cnt), 0,
+            images[texture].width/sprite_cnt, images[texture].height,
+            Math.floor((center.x - size.width / 2) * world.size + world.left),
+            Math.floor((center.y - size.height / 2) * world.size + world.top),
+            Math.ceil(size.width * world.size), Math.ceil(size.height * world.size));
 
         context.restore();
 
@@ -174,23 +188,6 @@ Rocket.graphics = (function() {
         context_shield.beginPath();
         context_shield.fillStyle = 'rgba(0,0,255,0.5)';
         context_shield.fillRect(0,0,canvas.width, canvas.height);
-
-        // context_shield.beginPath();
-        // context_shield.arc(world.left + (center.x - view.left)*world.size,
-        // world.top + (center.y - view.top) * world.size,
-        // center.radius*world.size, 0, 2 * Math.PI);
-        // context_shield.strokeStyle = "red";
-        // context_shield.lineWidth = 50;
-        // context_shield.stroke();
-
-        //drawing the bunny-ring makes the rendering suck bad
-        // context_shield.beginPath();
-        // context_shield.arc(world.left + (center.x - view.left)*world.size,
-        // world.top + (center.y - view.top) * world.size,
-        // center.radius*world.size, 0, 2 * Math.PI);
-        // context_shield.strokeStyle = context_shield.createPattern(document.getElementById('bunnyimg'), 'repeat');
-        // context_shield.lineWidth = 50;
-        // context_shield.stroke();
 
         context_shield.beginPath();
         context_shield.globalCompositeOperation = 'destination-out';

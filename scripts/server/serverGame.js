@@ -28,9 +28,23 @@ let pickups = {};
 let killedPlayers = [];
 
 function createMissile(userId, user) {
-    let timeM;
+    let timeM, acceleration;
+    switch (user.inventory.weapon){
+        case 1:
+            timeM = 1500;
+            acceleration = 1.013;
+            break;
+        case 0:
+            timeM = 1500;
+            acceleration = 1;
+            break;
+        default:
+        case -1:
+            timeM = 200;
+            acceleration = 1;
+            break;
+    }
     if(user.inventory.weapon < 0){
-        timeM = 200;
     }else{
         timeM = 1500;
     }
@@ -43,6 +57,7 @@ function createMissile(userId, user) {
             y: user.worldView.y
         },
         direction: user.orientation,
+        acceleration: acceleration,
         speed: user.speed,
         time: timeM
     });
@@ -135,7 +150,6 @@ function obstacle(user){
         };
 
         if (collided(treePosition, newCenter)) {
-            console.log('tree')
             let deltaX = user.worldView.x - treePosition.position.x;
             let deltaY = (treePosition.position.y + treePosition.radius) - user.worldView.y;
             let objDir = Math.atan2(deltaY, deltaX);
@@ -148,7 +162,6 @@ function obstacle(user){
     }
 
     for (let index in buildings.buildingArray){
-        console.log('building')
         let buildingPosition = {
             position: {
                 x: buildings.buildingArray[index].model.position.x,
@@ -182,6 +195,8 @@ function obstacle(user){
 function killedPlayer(clientId){
     activeUsers[clientId].user.dead = true;
     activeUsers[clientId].user.inventory.ammo = 0;
+    activeUsers[clientId].user.inventory.health = 0;
+
 }
 
 //------------------------------------------------------------------
@@ -200,7 +215,7 @@ function update(elapsedTime, currentTime) {
     if(gameTime < 0) {
         gameTime = 10*60;
     }
-    shield.radius = Math.sqrt(32)*(gameTime/(10*60));
+    shield.radius = 4*(gameTime/(10*60));
     for (let clientId in activeUsers) {
         activeUsers[clientId].user.update(currentTime);
     }
@@ -249,7 +264,7 @@ function update(elapsedTime, currentTime) {
                         if(activeUsers[clientId].user.inventory.health < 1){
                             killedPlayer(clientId);
                         }
-                        
+
                     }
                 }
             }
@@ -287,10 +302,10 @@ function update(elapsedTime, currentTime) {
     activeMissiles = keepMissiles;
 
    // Check if player has picked up items
-   
+
     for (let clientId in activeUsers) {
         if(!activeUsers[clientId].user.dead){
-            let keepPickups = [];   // 
+            let keepPickups = [];   //
             let localPickups = pickups.row[Math.floor(activeUsers[clientId].user.worldView.y)].col[Math.floor(activeUsers[clientId].user.worldView.x)];
                 for (let pickup in localPickups) {
                     let hit = false;
@@ -329,6 +344,9 @@ function update(elapsedTime, currentTime) {
                     }
                 }
                 pickups.row[Math.floor(activeUsers[clientId].user.worldView.y)].col[Math.floor(activeUsers[clientId].user.worldView.x)] = keepPickups;
+
+                if(!collided({position:shield,radius:shield.radius},activeUsers[clientId].user)) {
+                    killedPlayer(clientId)               }
         }
     }
 }
@@ -454,6 +472,7 @@ function updateClients(elapsedTime) {
             shield: shield,
             dead: activeUsers[clientId].user.dead,
             ammo: activeUsers[clientId].user.inventory.ammo,
+            weapon: activeUsers[clientId].user.inventory.weapon,
             health: activeUsers[clientId].user.inventory.health
         };
         if (client.user.reportUpdate) {
@@ -491,7 +510,7 @@ function updateClients(elapsedTime) {
 function initializeShield() {
     shield.x = Math.random() * 3 + 1;
     shield.y = Math.random() * 3 + 1;
-    shield.radius = Math.sqrt(32);
+    shield.radius = 4;
 }
 
 function initializePickups() {
