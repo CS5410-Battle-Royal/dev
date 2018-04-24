@@ -26,6 +26,9 @@ let trees;
 let buildings;
 let pickups = {};
 let killedPlayers = [];
+let livingPlayers = 0;
+let gameOver = false;
+let gameInProgress = false;
 
 function createMissile(userId, user) {
     let timeM;
@@ -173,6 +176,14 @@ function obstacle(user){
     return newCenter.position;
 }
 
+function endGame() {
+    for (let clientId in activeUsers) {
+        if(!activeUsers[clientId].user.dead){
+            activeUsers[clientId].user.winner = true;
+        }
+    }
+}
+
 //------------------------------------------------------------------
 //
 // This Kills the player and takes care of player data
@@ -183,6 +194,7 @@ function killedPlayer(clientId){
     activeUsers[clientId].user.dead = true;
     activeUsers[clientId].user.inventory.ammo = 0;
     activeUsers[clientId].user.inventory.health = 0;
+    livingPlayers--;
 
 }
 
@@ -192,16 +204,18 @@ function killedPlayer(clientId){
 //
 //------------------------------------------------------------------
 function update(elapsedTime, currentTime) {
-    gameTime = (gameTime - elapsedTime/1000);
+    gameTime = (gameTime - 10*elapsedTime/1000);
+    if(gameTime < 0 || livingPlayers === 1) {
+        endGame();
+        quit = true;
+    }
+
 
     for (let clientId in activeUsers) {
         activeUsers[clientId].user.worldView = obstacle(activeUsers[clientId].user);
         activeUsers[clientId].user.projected = activeUsers[clientId].user.worldView;
     }
 
-    if(gameTime < 0) {
-        gameTime = 10*60;
-    }
     shield.radius = 4*(gameTime/(10*60));
     for (let clientId in activeUsers) {
         activeUsers[clientId].user.update(currentTime);
@@ -459,7 +473,9 @@ function updateClients(elapsedTime) {
             shield: shield,
             dead: activeUsers[clientId].user.dead,
             ammo: activeUsers[clientId].user.inventory.ammo,
-            health: activeUsers[clientId].user.inventory.health
+            health: activeUsers[clientId].user.inventory.health,
+            winner: activeUsers[clientId].user.winner,
+            done: quit
         };
         if (client.user.reportUpdate) {
             update.pickups = getLocalWeapons(client);
@@ -507,8 +523,11 @@ function initializePickups() {
             pickups.row[r].col.push([]);
         }
     }
+}
 
-    for (let i = 0; i < 50; i++) {
+function placePickups() {
+
+    for (let i = 0; i < connections*2; i++) {
         let tempx = Math.random() * (5-2/3) + 1/3;
         let tempy = Math.random() * (5-2/3) + 1/3;
         let tempPosition = {x: tempx, y: tempy};
@@ -516,7 +535,7 @@ function initializePickups() {
     }
 
 
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < connections*10; i++) {
         let tempx = Math.random() * (5-2/3) + 1/3;
         let tempy = Math.random() * (5-2/3) + 1/3;
         let tempPosition = {x: tempx, y: tempy};
@@ -524,7 +543,7 @@ function initializePickups() {
     }
 
 
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < connections; i++) {
         let tempx = Math.random() * (5-2/3) + 1/3;
         let tempy = Math.random() * (5-2/3) + 1/3;
         let tempPosition = {x: tempx, y: tempy};
@@ -532,7 +551,7 @@ function initializePickups() {
     }
 
 
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < connections; i++) {
         let tempx = Math.random() * (5-2/3) + 1/3;
         let tempy = Math.random() * (5-2/3) + 1/3;
         let tempPosition = {x: tempx, y: tempy};
@@ -587,10 +606,15 @@ function initializeSocketIO(http) {
                 pastSeconds = seconds;
             }
             if (seconds === 0){
-                io.emit('start game', 'countdown finished');
+                if(!gameInProgress){
+                    io.emit('start game', 'countdown finished');
+                }
                 clearInterval(refresh);
                 reconnection = true;
                 gameTime = 10 * 60;
+                placePickups();
+                livingPlayers = connections;
+                gameInProgress = true;
             }
         }, 1000);
     }
