@@ -278,7 +278,7 @@ function update(elapsedTime, currentTime) {
         activeUsers[clientId].user.projected = activeUsers[clientId].user.worldView;
     }
 
-    shield.radius = 4*(gameTime/(10*60));
+    shield.radius = 4.3*(gameTime/(10*60));
     for (let clientId in activeUsers) {
         activeUsers[clientId].user.update(currentTime);
     }
@@ -315,7 +315,7 @@ function update(elapsedTime, currentTime) {
                             hitPlayer: true,
                             direction: activeMissiles[missile].direction
                         });
-                        
+
 
                         if(activeMissiles[missile].missileType < 0){
                             activeUsers[clientId].user.inventory.health -= 5;
@@ -585,7 +585,7 @@ function updateClients(elapsedTime) {
 function initializeShield() {
     shield.x = Math.random() * 3 + 1;
     shield.y = Math.random() * 3 + 1;
-    shield.radius = 4;
+    shield.radius = 4.3;
 }
 
 function initializePickups() {
