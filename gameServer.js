@@ -37,6 +37,7 @@ app.use('/css',express.static(path.join(__dirname,'css')));
 app.use('/scripts/client',express.static(path.join(__dirname,'scripts/client')));
 app.use('/scripts/persistant',express.static(path.join(__dirname,'scripts/persistant')));
 app.use('/images', express.static(path.join(__dirname, 'images')));
+app.use('/audio', express.static(path.join(__dirname, 'audio')));
 
 app.get('/', function(request, response){
 

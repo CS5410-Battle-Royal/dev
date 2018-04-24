@@ -1,6 +1,7 @@
 Rocket.main = (function(input, logic, graphics, assets) {
 
     let socketIO = null;
+    let rflying = new Audio('/audio/missileflying.mp3');
 
     let keyboard = input.Keyboard(), lastTimeStamp, messageId = 1,
         myPlayer = {
@@ -233,6 +234,7 @@ Rocket.main = (function(input, logic, graphics, assets) {
                     break;
                 case NetworkIds.MISSILE_NEW:
                     missileNew(message.data);
+                    playrlaunch();
                     break;
                 case NetworkIds.MISSILE_HIT:
                     if (!message.data.hitPlayer) {
@@ -599,6 +601,7 @@ Rocket.main = (function(input, logic, graphics, assets) {
                 if (missiles[missile].particle){
                     missiles[missile].particle.render(background.viewport);
                 }
+                rflying.play();
             }
         }
         for (let pickup in pickups){
@@ -728,6 +731,20 @@ Rocket.main = (function(input, logic, graphics, assets) {
             });
         }
     }
+
+    function playrlaunch(){
+        if(myPlayer.model.weapon<0){
+            let sfx_throw = new Audio('/audio/sfx_throw.mp3');
+            sfx_throw.play();
+        }else if(myPlayer.model.weapon < 1){
+            let iceball = new Audio('/audio/iceball.mp3');
+            iceball.play();
+        }else{
+            let rlaunch = new Audio('/audio/rlaunch.mp3');
+            rlaunch.play();
+        }
+        
+        }
 
     function createObstacles() {
         makeTrees();
