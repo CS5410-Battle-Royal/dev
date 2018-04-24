@@ -8,18 +8,21 @@ Rocket.main = (function(input, logic, graphics, assets) {
     let keyboard = input.Keyboard(), lastTimeStamp, messageId = 1,
         myPlayer = {
             model: logic.Player(),
-            texture: 'bunny.png',
             sprite: logic.Sprite({
                 spriteSheet: 'bunnysheet.png',
                 spriteCount: 8,
+                me: true,
                 spriteSize: .05,			// Maintain the size on the sprite
             }, graphics)},
         background = null,
+        initialized = false,
         mini = graphics.miniMap(),
         jobQueue = logic.createQueue(),
         otherUsers = [],
         missiles = {},
         hits = [],
+        pregame = true,
+        gameCount = 0,
         gameTime = 10 * 60, //seconds
         shield = {x:0,y:0,radius:0,particles:[]},
         pickups = [],
@@ -34,7 +37,8 @@ Rocket.main = (function(input, logic, graphics, assets) {
         treeArray = [],
         buildingArray = [],
         treeIndex = [ [1, .5], [.5, 2.75], [1.5, 4.5], [2.3, 2.5], [2.5, 2.3], [3.25, 2], [4.5, 2.5], [3.5, 4]],
-        buildingIndex = [ [1.75, 1], [4, 1], [2.75, 2.75], [4.3, 3]];
+        buildingIndex = [ [1.75, 1], [4, 1], [2.75, 2.75], [4.3, 3]],
+        myId;
 
         for(let a = 0; a < 2*Math.PI; a+=((2*Math.PI)/360)) {
             shield.particles.push(logic.ParticleSystem({
@@ -304,20 +308,31 @@ Rocket.main = (function(input, logic, graphics, assets) {
 
     function connectPlayerOther(data) {
         let model = logic.OtherPlayer();
-
         otherUsers[data.userId] = {
             model: model,
-            texture: 'bunny.png'
+            texture: 'bunny.png',
+            sprite: logic.Sprite({
+                spriteSheet: 'bunnysheet.png',
+                spriteCount: 8,
+                me: false,
+                spriteSize: .05,			// Maintain the size on the sprite
+            }, graphics)
         };
     }
 
     function reconnectPlayerOther(data) {
         let model = logic.OtherPlayer();
         model.state.orientation = data.orientation;
-
+        model.map = data.position;
         otherUsers[data.userId] = {
             model: model,
-            texture: 'bunny.png'
+            texture: 'bunny.png',
+            sprite: logic.Sprite({
+                spriteSheet: 'bunnysheet.png',
+                spriteCount: 8,
+                me: false,
+                spriteSize: .05,			// Maintain the size on the sprite
+            }, graphics)
         };
     }
 
@@ -506,11 +521,26 @@ Rocket.main = (function(input, logic, graphics, assets) {
 
     function update(elapsedTime){
         updateMsgs();
+        if (pregame) {
+            if (isNaN(gameCount)){
+                gameCount = 0;
+            }
+            gameCount += elapsedTime;
+            if (gameCount > 10000 && !initialized){
+                document.addEventListener("click", printMousePos);
+            }
+            if (gameCount > 20000) {
+                pregame = false;
+                document.removeEventListener("click", printMousePos);
+                update(elapsedTime);
+            }
+        }
         shiftView(myPlayer.model.position, elapsedTime);
         myPlayer.model.position = obstacle();
         myPlayer.model.projected = myPlayer.model.position;
         for (let index in otherUsers){
             otherUsers[index].model.update(elapsedTime);
+            otherUsers[index].sprite.update(elapsedTime);
         }
         myPlayer.sprite.update(elapsedTime);
 
@@ -589,6 +619,22 @@ Rocket.main = (function(input, logic, graphics, assets) {
 
     function render(){
         graphics.clear();
+        if (pregame){
+            graphics.drawGame();
+            let myPosition = {
+                x: (myPlayer.model.position.x + background.viewport.left)/5,
+                y: (myPlayer.model.position.y + background.viewport.top)/5,
+            }
+            graphics.drawPeople(myPosition);
+            for (let index in otherUsers){
+                let position = {
+                    x: otherUsers[index].model.map.x/5,
+                    y: otherUsers[index].model.map.y/5
+                }
+                graphics.drawPeople(position);
+            }
+            return;
+        }
         background.render();
 
         for (let index in otherUsers){
@@ -597,8 +643,9 @@ Rocket.main = (function(input, logic, graphics, assets) {
             let position = drawObjects(object);
             if(!otherUsers[index].model.state.dead){
                 if (position.hasOwnProperty('x')){
-                    graphics.draw(otherUsers[index].texture, position,
-                        otherUsers[index].model.size, otherUsers[index].model.state.orientation, false)
+                    otherUsers[index].sprite.render(position, otherUsers[index].model.state.orientation);
+                    // graphics.draw(otherUsers[index].texture, position,
+                    //     otherUsers[index].model.size, otherUsers[index].model.state.orientation, false)
                 }
             }
         }
@@ -687,7 +734,6 @@ Rocket.main = (function(input, logic, graphics, assets) {
         document.getElementById('field-clock').innerHTML = gameClock(gameTime);
         document.getElementById('health-display').innerHTML = "Health: " + myPlayer.model.health;
         document.getElementById('ammo-display').innerHTML = "Ammo: " + myPlayer.model.ammo;
-        // console.log("Ammo: " + myPlayer.model.ammo);
     }
 
     function gameLoop(time) {
@@ -769,7 +815,21 @@ Rocket.main = (function(input, logic, graphics, assets) {
         makeBuildings();
     }
 
+    function printMousePos(event) {
+        let message = {
+            id: messageId++,
+            type: NetworkIds.CLICK,
+            userId: myId,
+            x: event.clientX,
+            y: event.clientY,
+            width: document.getElementById('canvas-pregame').width,
+            height: document.getElementById('canvas-pregame').height
+        };
+        socketIO.emit(NetworkIds.INPUT, message);
+    }
+
     function init(socket, userId) {
+        myId = userId;
         socketIO = socket;
         background = graphics.TiledImage({
             pixel: { width: assets['background'].width, height: assets['background'].height },
@@ -779,8 +839,9 @@ Rocket.main = (function(input, logic, graphics, assets) {
         });
 
         background.setViewport(0.00, 0.00);
-        graphics.createImage(myPlayer.texture);
+        graphics.createImage('bunny.png');
         graphics.createImage('bunnysheet.png');
+        graphics.createImage('2000x2000map.png');
         graphics.createImage('carrot.png');
         graphics.createImage('bazooka1.png');
         graphics.createImage('bazooka2.png');
