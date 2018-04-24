@@ -252,15 +252,9 @@ Rocket.main = (function(input, logic, graphics, assets) {
         if (data.hasOwnProperty('health')){
             myPlayer.model.health = data.health;
         }
-        // else{
-        //     myPlayer.model.health = 0;
-        // }
         if (data.hasOwnProperty('ammo')){
             myPlayer.model.ammo = data.ammo;
         }
-        // else{
-        //     myPlayer.model.ammo = 0;
-        // }
         if (data.dead){
             myPlayer.model.dead = data.dead;
         }
