@@ -252,7 +252,7 @@ Rocket.main = (function(input, logic, graphics, assets) {
             }
         }
         if(data.hasOwnProperty('done')) {
-
+            if(done){
                 document.getElementById('id-highscores').hidden = false;
                 document.getElementById('id-game').hidden = true;
 
@@ -274,6 +274,8 @@ Rocket.main = (function(input, logic, graphics, assets) {
                   }
                };
                 req.send();
+            }
+
         }
         if (data.hasOwnProperty('weapon')){
             myPlayer.model.weapon = data.weapon;
