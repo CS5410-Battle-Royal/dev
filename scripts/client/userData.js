@@ -362,7 +362,10 @@ Rocket.logic.ParticleSystem = function(spec, graphics) {
                 rotation: 0,
                 lifetime: Math.random()*spec.lifetime,	// milliseconds
                 alive: 0,
-                size: spec.size,
+                size: {
+                    width: spec.size,
+                    height: spec.size
+                },
                 fill: spec.fill,
                 stroke: 'black'
             };

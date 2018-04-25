@@ -642,9 +642,7 @@ Rocket.main = (function(input, logic, graphics, assets) {
             let position = drawObjects(object);
             if(!otherUsers[index].model.state.dead){
                 if (position.hasOwnProperty('x')){
-                    otherUsers[index].sprite.render(position, otherUsers[index].model.state.orientation);
-                    // graphics.draw(otherUsers[index].texture, position,
-                    //     otherUsers[index].model.size, otherUsers[index].model.state.orientation, false)
+                    otherUsers[index].sprite.render(position, otherUsers[index].model.state.orientation - (Math.PI/2));
                 }
             }
         }
@@ -655,7 +653,6 @@ Rocket.main = (function(input, logic, graphics, assets) {
                 if (missiles[missile].particle){
                     missiles[missile].particle.render(background.viewport);
                 }
-                //rflying.play();
             }
         }
         for (let pickup in pickups){
@@ -704,6 +701,18 @@ Rocket.main = (function(input, logic, graphics, assets) {
                     graphics.draw('bazooka1.png', position, size, myPlayer.model.orientation, false);
                 }
             }
+            let rectSize = {
+                width: .05,
+                height: .01
+            }
+            let rectPosition = {
+                x: myPlayer.model.position.x - .02,
+                y: myPlayer.model.position.y - .04
+            }
+
+            graphics.drawRectangle(rectPosition, rectSize, 0, 'red', 'black');
+            rectSize.width = (myPlayer.model.health/100)*rectSize.width;
+            graphics.drawRectangle(rectPosition, rectSize, 0, 'green', 'black');
         }
 
         for (let tree in treeArray){

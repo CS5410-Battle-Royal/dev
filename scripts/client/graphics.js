@@ -348,10 +348,10 @@ Rocket.graphics = (function() {
         context.strokeStyle = stroke;
         context.fillRect(Math.floor((position.x)* world.size + world.left),
             Math.floor((position.y) * world.size + world.top),
-            size*world.size, size*world.size);
+            size.width*world.size, size.height*world.size);
         context.strokeRect(Math.floor((position.x)* world.size + world.left),
             Math.floor((position.y) * world.size + world.top),
-            size*world.size, size*world.size);
+            size.width*world.size, size.height*world.size);
 
         context.restore();
     }
