@@ -8,10 +8,11 @@ Rocket.main = (function(input, logic, graphics, assets) {
         myPlayer = {
             model: logic.Player(),
             sprite: logic.Sprite({
-                spriteSheet: 'bunnysheet.png',
-                spriteCount: 8,
+                spriteSheet: 'farmersheet.png',
+                spriteCount: 6,
                 me: true,
-                spriteSize: .05,			// Maintain the size on the sprite
+                spriteTime: [200, 200, 200, 200, 200, 200],
+                spriteSize: .05, // Maintain the size on the sprite
             }, graphics)},
         background = null,
         initialized = false,
@@ -313,6 +314,7 @@ Rocket.main = (function(input, logic, graphics, assets) {
             sprite: logic.Sprite({
                 spriteSheet: 'bunnysheet.png',
                 spriteCount: 8,
+                spriteTime: [100, 100, 100, 100, 100, 100, 100, 100],
                 me: false,
                 spriteSize: .05,			// Maintain the size on the sprite
             }, graphics)
@@ -329,6 +331,7 @@ Rocket.main = (function(input, logic, graphics, assets) {
             sprite: logic.Sprite({
                 spriteSheet: 'bunnysheet.png',
                 spriteCount: 8,
+                spriteTime: [100, 100, 100, 100, 100, 100, 100, 100],
                 me: false,
                 spriteSize: .05,			// Maintain the size on the sprite
             }, graphics)
@@ -849,6 +852,7 @@ Rocket.main = (function(input, logic, graphics, assets) {
         background.setViewport(0.00, 0.00);
         graphics.createImage('bunny.png');
         graphics.createImage('bunnysheet.png');
+        graphics.createImage('farmersheet.png');
         graphics.createImage('2000x2000map.png');
         graphics.createImage('carrot.png');
         graphics.createImage('bazooka1.png');

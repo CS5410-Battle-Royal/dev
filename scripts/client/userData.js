@@ -231,7 +231,7 @@ Rocket.logic.Sprite = function(spec, graphics) {
 
     let texture = spec.spriteSheet;
     let spriteCount = spec.spriteCount;
-    let spriteTime = [100, 100, 100, 100, 100, 100, 100, 100];
+    let spriteTime = spec.spriteTime;
     let spriteSize = {
             width: spec.spriteSize,
             height: spec.spriteSize
