@@ -82,7 +82,6 @@ function processInput(elapsedTime) {
     while (!processMe.empty) {
         let input = processMe.dequeue();
         let client = activeUsers[input.message.userId];
-        client.lastMessageId = input.message.id;
         switch (input.message.type) {
             case NetworkIds.INPUT_MOVE_DOWN:
                 client.user.moveDown(input.message.elapsedTime);
@@ -538,7 +537,6 @@ function updateClients(elapsedTime) {
         let client = activeUsers[clientId];
         let update = {
             clientId: clientId,
-            lastMessageId: client.lastMessageId,
             orientation: client.user.orientation,
             worldView: client.user.worldView,
             updateWindow: lastUpdate,
@@ -729,7 +727,6 @@ function initializeSocketIO(http) {
                 // Tell existing about the newly connected player
                 client.socket.emit(NetworkIds.RECONNECT_OTHER, {
                     clientId: newUser.clientId,
-                    lastMessageId: newUser.lastMessageId,
                     orientation: newUser.orientation,
                     worldView: newUser.worldView,
                     userId: newUser.userId
@@ -738,7 +735,6 @@ function initializeSocketIO(http) {
                 // Tell the new player about the already connected player
                 socket.emit(NetworkIds.RECONNECT_OTHER, {
                     clientId: clientId,
-                    lastMessageId: client.lastMessageId,
                     orientation: client.user.orientation,
                     worldView: client.user.worldView,
                     userId: client.user.userId

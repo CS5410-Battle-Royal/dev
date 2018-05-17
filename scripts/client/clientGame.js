@@ -8,10 +8,11 @@ Rocket.main = (function(input, logic, graphics, assets) {
         myPlayer = {
             model: logic.Player(),
             sprite: logic.Sprite({
-                spriteSheet: 'bunnysheet.png',
-                spriteCount: 8,
+                spriteSheet: 'farmersheet.png',
+                spriteCount: 6,
                 me: true,
-                spriteSize: .05,			// Maintain the size on the sprite
+                spriteTime: [200, 200, 200, 200, 200, 200],
+                spriteSize: .05, // Maintain the size on the sprite
             }, graphics)},
         background = null,
         initialized = false,
@@ -313,6 +314,7 @@ Rocket.main = (function(input, logic, graphics, assets) {
             sprite: logic.Sprite({
                 spriteSheet: 'bunnysheet.png',
                 spriteCount: 8,
+                spriteTime: [100, 100, 100, 100, 100, 100, 100, 100],
                 me: false,
                 spriteSize: .05,			// Maintain the size on the sprite
             }, graphics)
@@ -329,6 +331,7 @@ Rocket.main = (function(input, logic, graphics, assets) {
             sprite: logic.Sprite({
                 spriteSheet: 'bunnysheet.png',
                 spriteCount: 8,
+                spriteTime: [100, 100, 100, 100, 100, 100, 100, 100],
                 me: false,
                 spriteSize: .05,			// Maintain the size on the sprite
             }, graphics)
@@ -642,9 +645,7 @@ Rocket.main = (function(input, logic, graphics, assets) {
             let position = drawObjects(object);
             if(!otherUsers[index].model.state.dead){
                 if (position.hasOwnProperty('x')){
-                    otherUsers[index].sprite.render(position, otherUsers[index].model.state.orientation);
-                    // graphics.draw(otherUsers[index].texture, position,
-                    //     otherUsers[index].model.size, otherUsers[index].model.state.orientation, false)
+                    otherUsers[index].sprite.render(position, otherUsers[index].model.state.orientation - (Math.PI/2));
                 }
             }
         }
@@ -655,7 +656,6 @@ Rocket.main = (function(input, logic, graphics, assets) {
                 if (missiles[missile].particle){
                     missiles[missile].particle.render(background.viewport);
                 }
-                //rflying.play();
             }
         }
         for (let pickup in pickups){
@@ -704,6 +704,18 @@ Rocket.main = (function(input, logic, graphics, assets) {
                     graphics.draw('bazooka1.png', position, size, myPlayer.model.orientation, false);
                 }
             }
+            let rectSize = {
+                width: .05,
+                height: .01
+            }
+            let rectPosition = {
+                x: myPlayer.model.position.x - .02,
+                y: myPlayer.model.position.y - .04
+            }
+
+            graphics.drawRectangle(rectPosition, rectSize, 0, 'red', 'black');
+            rectSize.width = (myPlayer.model.health/100)*rectSize.width;
+            graphics.drawRectangle(rectPosition, rectSize, 0, 'green', 'black');
         }
 
         for (let tree in treeArray){
@@ -840,6 +852,7 @@ Rocket.main = (function(input, logic, graphics, assets) {
         background.setViewport(0.00, 0.00);
         graphics.createImage('bunny.png');
         graphics.createImage('bunnysheet.png');
+        graphics.createImage('farmersheet.png');
         graphics.createImage('2000x2000map.png');
         graphics.createImage('carrot.png');
         graphics.createImage('bazooka1.png');

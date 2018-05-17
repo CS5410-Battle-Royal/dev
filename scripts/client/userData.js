@@ -231,7 +231,7 @@ Rocket.logic.Sprite = function(spec, graphics) {
 
     let texture = spec.spriteSheet;
     let spriteCount = spec.spriteCount;
-    let spriteTime = [100, 100, 100, 100, 100, 100, 100, 100];
+    let spriteTime = spec.spriteTime;
     let spriteSize = {
             width: spec.spriteSize,
             height: spec.spriteSize
@@ -362,7 +362,10 @@ Rocket.logic.ParticleSystem = function(spec, graphics) {
                 rotation: 0,
                 lifetime: Math.random()*spec.lifetime,	// milliseconds
                 alive: 0,
-                size: spec.size,
+                size: {
+                    width: spec.size,
+                    height: spec.size
+                },
                 fill: spec.fill,
                 stroke: 'black'
             };
